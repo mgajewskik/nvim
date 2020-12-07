@@ -57,6 +57,18 @@ zle -N history-beginning-search-forward-end history-search-end
 ### Set variables
 #################
 PATH="/usr/local/bin:/usr/local/sbin/:$PATH"
+path+=('/usr/local/bin')
+path+=('$HOME/.local/bin')
+path+=('$HOME/.poetry/bin')
+path+=('/usr/local/go/bin')
+path+=('$HOME/.cargo/bin')
+export PATH
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+
 HISTFILE=$HOME/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
@@ -371,6 +383,10 @@ if ! zplug check --verbose; then
     if read -q; then
         echo; zplug install
     fi
+fi
+
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
