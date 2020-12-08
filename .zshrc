@@ -1,23 +1,10 @@
 source ~/.zplug/init.zsh
 
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 zplug "zplug/zplug", hook-build:'zplug --self-manage'
-zplug "romkatv/powerlevel10k", as:theme, depth:1
+zplug "denysdovhan/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
 zplug "zsh-users/zsh-syntax-highlighting"
 zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-history-substring-search"
-zplug "junegunn/fzf-bin", \
-    from:gh-r, \
-    as:command, \
-    rename-to:fzf, \
-    use:"*darwin*amd64*"
-
 
 ### Set/unset ZSH options
 #########################
@@ -44,6 +31,9 @@ setopt   autoresume histignoredups pushdsilent
 setopt   autopushd pushdminus extendedglob rcquotes mailwarning
 unsetopt bgnice autoparamslash
 
+unsetopt correct_all
+setopt correct
+
 ### Autoload zsh modules when they are referenced
 #################################################
 autoload -U history-search-end
@@ -68,6 +58,8 @@ export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$HOME/.poetry/bin:$PATH"
+
 
 HISTFILE=$HOME/.zsh_history
 HISTSIZE=10000
@@ -127,6 +119,38 @@ NC="\e[m"               # Color Reset
 #PS1="[%(!.${PR_RED}%n.$PR_LIGHT_YELLOW%n)%(!.${PR_LIGHT_YELLOW}@.$PR_RED@)$PR_NO_COLOR%(!.${PR_LIGHT_RED}%U%m%u.${PR_LIGHT_GREEN}%U%m%u)$PR_NO_COLOR:%(!.${PR_RED}%2c.${PR_BLUE}%2c)$PR_NO_COLOR]%(?..[${PR_LIGHT_RED}%?$PR_NO_COLOR])%(!.${PR_LIGHT_RED}#.${PR_LIGHT_GREEN}$) "
 #RPS1="$PR_LIGHT_YELLOW(%D{%m-%d %H:%M})$PR_NO_COLOR"
 #unsetopt ALL_EXPORT
+SPACESHIP_PROMPT_ADD_NEWLINE=false
+SPACESHIP_PROMPT_SEPARATE_LINE=false
+SPACESHIP_PROMPT_DEFAULT_PREFIX=""
+#SPACESHIP_CHAR_SYMBOL=❯
+SPACESHIP_CHAR_SUFFIX=" "
+SPACESHIP_GIT_PREFIX=""
+SPACESHIP_GIT_STATUS_STASHED=""
+#SPACESHIP_HG_SHOW=false
+SPACESHIP_PACKAGE_SHOW=false
+SPACESHIP_NODE_SHOW=false
+SPACESHIP_RUBY_SHOW=false
+SPACESHIP_ELM_SHOW=false
+SPACESHIP_ELIXIR_SHOW=false
+SPACESHIP_XCODE_SHOW_LOCAL=false
+SPACESHIP_SWIFT_SHOW_LOCAL=false
+SPACESHIP_GOLANG_SHOW=false
+SPACESHIP_PHP_SHOW=false
+SPACESHIP_RUST_SHOW=false
+SPACESHIP_JULIA_SHOW=false
+SPACESHIP_DOCKER_SHOW=false
+SPACESHIP_DOCKER_CONTEXT_SHOW=false
+#SPACESHIP_AWS_SHOW=false
+#SPACESHIP_CONDA_SHOW=false
+#SPACESHIP_VENV_SHOW=false
+SPACESHIP_PYENV_SHOW=false
+#SPACESHIP_DOTNET_SHOW=false
+#SPACESHIP_EMBER_SHOW=false
+#SPACESHIP_KUBECONTEXT_SHOW=false
+#SPACESHIP_TERRAFORM_SHOW=false
+#SPACESHIP_TERRAFORM_SHOW=false
+#SPACESHIP_VI_MODE_SHOW=false
+#SPACESHIP_JOBS_SHOW=false
 
 ### set common functions
 #############
@@ -241,6 +265,17 @@ alias zshconfig="mate ~/.zshrc"
 alias vim=nvim
 alias vi=nvim
 alias myconfig='/usr/bin/git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
+alias syu='sudo apt update && sudo apt upgrade'
+alias -- -='cd -'
+
+alias ta='tmux attach -t'
+alias tad='tmux attach -d -t'
+alias ts='tmux new-session -s'
+alias tl='tmux list-sessions'
+alias tksv='tmux kill-server'
+alias tkss='tmux kill-session -t'
+
+alias poetry=$HOME/.poetry/bin/poetry
 
 ### Bind keys
 #############
@@ -389,6 +424,21 @@ if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
 
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/mgajewskik/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/mgajewskik/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/mgajewskik/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/mgajewskik/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # --files: List files that would be searched but do not search
@@ -402,8 +452,6 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*" --glob
 export BAT_THEME="Solarized (light)"
 [[ /usr/bin/kubectl ]] && source <(kubectl completion zsh)
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 # Then, source plugins and add commands to $PATH
-zplug load --verbose >/dev/null
+#zplug load --verbose >/dev/null
+zplug load
