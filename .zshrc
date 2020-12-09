@@ -1,51 +1,196 @@
-source ~/.zplug/init.zsh
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
-zplug "zplug/zplug", hook-build:'zplug --self-manage'
-zplug "denysdovhan/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
-zplug "zsh-users/zsh-syntax-highlighting"
-zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-history-substring-search"
+#####################
+# FIRST PROMPT LINE #
+#####################
+#rosso='\e[1;34m'
+#NC='\e[0m'
+#echo -e "${rosso}Debian${NC}" `cat /etc/debian_version` "| ${rosso}ZSH${NC} ${ZSH_VERSION}"
 
-### Set/unset ZSH options
-#########################
-# setopt NOHUP
-# setopt NOTIFY
-# setopt NO_FLOW_CONTROL
-setopt INC_APPEND_HISTORY SHARE_HISTORY
-setopt APPEND_HISTORY
-# setopt AUTO_LIST
-# setopt AUTO_REMOVE_SLASH
-# setopt AUTO_RESUME
-unsetopt BG_NICE
-setopt CORRECT
-setopt EXTENDED_HISTORY
-# setopt HASH_CMDS
-setopt MENUCOMPLETE
-setopt ALL_EXPORT
+#####################
+# ZINIT             #
+#####################
+### Added by Zinit's installer
+if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
+    print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
+    command mkdir -p $HOME/.zinit
+    command git clone https://github.com/zdharma/zinit $HOME/.zinit/bin && \
+        print -P "%F{33}▓▒░ %F{34}Installation successful.%F" || \
+        print -P "%F{160}▓▒░ The clone has failed.%F"
+fi
+source "$HOME/.zinit/bin/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+### End of Zinit installer's chunk
 
-### Set/unset  shell options
-############################
-setopt   notify globdots correct pushdtohome cdablevars autolist
-setopt   correctall autocd recexact longlistjobs
-setopt   autoresume histignoredups pushdsilent
-setopt   autopushd pushdminus extendedglob rcquotes mailwarning
-unsetopt bgnice autoparamslash
+#####################
+# THEME             #
+#####################
+zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-unsetopt correct_all
-setopt correct
+#####################
+# PLUGINS           #
+#####################
+# SSH-AGENT
+zinit light bobsoppe/zsh-ssh-agent
+# AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+zinit ice wait"0a" lucid atload"_zsh_autosuggest_start"
+zinit light zsh-users/zsh-autosuggestions
+# ENHANCD
+zinit ice wait"0b" lucid
+zinit light b4b4r07/enhancd
+export ENHANCD_FILTER=fzf:fzy:peco
+# HISTORY SUBSTRING SEARCHING
+zinit ice wait"0b" lucid atload'bindkey "$terminfo[kcuu1]" history-substring-search-up; bindkey "$terminfo[kcud1]" history-substring-search-down'
+zinit light zsh-users/zsh-history-substring-search
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+# TAB COMPLETIONS
+zinit ice wait"0b" lucid blockf
+zinit light zsh-users/zsh-completions
+zstyle ':completion:*' completer _expand _complete _ignored _approximate
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' menu select=2
+zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+zstyle ':completion:*:descriptions' format '-- %d --'
+zstyle ':completion:*:processes' command 'ps -au$USER'
+zstyle ':completion:complete:*:options' sort false
+zstyle ':fzf-tab:complete:_zlua:*' query-string input
+zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
+zstyle ':fzf-tab:complete:kill:argument-rest' extra-opts --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
+zstyle ':fzf-tab:complete:cd:*' extra-opts --preview=$extract'exa -1 --color=always ${~ctxt[hpre]}$in'
+# FZF
+zinit ice lucid wait'0b' from"gh-r" as"program"
+zinit light junegunn/fzf
+# FZF BYNARY AND TMUX HELPER SCRIPT
+zinit ice lucid wait'0c' as"command" pick"bin/fzf-tmux"
+zinit light junegunn/fzf
+# BIND MULTIPLE WIDGETS USING FZF
+zinit ice lucid wait'0c' multisrc"shell/{completion,key-bindings}.zsh" id-as"junegunn/fzf_completions" pick"/dev/null"
+zinit light junegunn/fzf
+# FZF-TAB
+zinit ice wait"1" lucid
+zinit light Aloxaf/fzf-tab
+# SYNTAX HIGHLIGHTING
+zinit ice wait"0c" lucid atinit"zpcompinit;zpcdreplay"
+zinit light zdharma/fast-syntax-highlighting
+## NVM
+#export NVM_AUTO_USE=true
+#zinit ice wait"1" lucid
+#zinit light lukechilds/zsh-nvm
+# EXA
+zinit ice wait"2" lucid from"gh-r" as"program" mv"exa* -> exa"
+zinit light ogham/exa
+zinit ice wait blockf atpull'zinit creinstall -q .'
+# DELTA
+zinit ice lucid wait"0" as"program" from"gh-r" pick"delta*/delta"
+zinit light 'dandavison/delta'
+# BAT
+zinit ice from"gh-r" as"program" mv"bat* -> bat" pick"bat/bat" atload"alias cat=bat"
+zinit light sharkdp/bat
+# BAT-EXTRAS
+zinit ice wait"1" as"program" pick"src/batgrep.sh" lucid
+zinit ice wait"1" as"program" pick"src/batdiff.sh" lucid
+zinit light eth-p/bat-extras
+alias rg=batgrep.sh
+alias bd=batdiff.sh
+alias man=batman.sh
+# RIPGREP
+zinit ice from"gh-r" as"program" mv"ripgrep* -> ripgrep" pick"ripgrep/rg"
+zinit light BurntSushi/ripgrep
+## NEOVIM
+#zinit ice from"gh-r" as"program" bpick"*appimage*" ver"stable" mv"nvim* -> nvim" pick"nvim"
+#zinit light neovim/neovim
+# FORGIT
+# ga - git add
+# glo - git log
+# gd - git diff
+zinit ice wait lucid
+zinit load 'wfxr/forgit'
+# LAZYGIT
+zinit ice lucid wait"0" as"program" from"gh-r" mv"lazygit* -> lazygit" atload"alias lg='lazygit'"
+zinit light 'jesseduffield/lazygit'
+# LAZYDOCKER
+zinit ice lucid wait"0" as"program" from"gh-r" mv"lazydocker* -> lazydocker" atload"alias lg='lazydocker'"
+zinit light 'jesseduffield/lazydocker'
+## RANGER
+#zinit ice depth'1' as"program" pick"ranger.py"
+#zinit light ranger/ranger
+# FD
+zinit ice as"command" from"gh-r" mv"fd* -> fd" pick"fd/fd"
+zinit light sharkdp/fd
+# GH-CLI
+zinit ice lucid wait"0" as"program" from"gh-r" pick"usr/bin/gh"
+zinit light "cli/cli"
+## GOOGLE-CLOUD-SDK COMPLETION
+#zinit ice as"completion"; zinit snippet /usr/share/google-cloud-sdk/completion.zsh.inc
+## TMUXINATOR
+#zinit ice as"completion"; zinit snippet ~/.nubem_dot_files/extras/tmuxinator/tmuxinator.zsh
+## BIT
+#zinit ice lucid wait"0" as"program" from"gh-r" pick"bit"
+#zinit light "chriswalz/bit"
+# ZSH MANYDOTS MAGIC
+zinit autoload'#manydots-magic' for knu/zsh-manydots-magic
+# ZSH DIFF SO FANCY
+# zinit ice wait"2" lucid as"program" pick"bin/git-dsf"
+# zinit light zdharma/zsh-diff-so-fancy
+# GIT-FLOW
+# zinit light petervanderdoes/git-flow-completion
+# RCLONE
+# zinit ice lucid wait"0" as"program" from"gh-r" bpick='*-linux-amd64.deb' pick"usr/bin/rclone"
+# zinit light 'rclone/rclone'
 
-### Autoload zsh modules when they are referenced
-#################################################
-autoload -U history-search-end
-zmodload -a zsh/stat stat
-zmodload -a zsh/zpty zpty
-zmodload -a zsh/zprof zprof
-#zmodload -ap zsh/mapfile mapfile
-zle -N history-beginning-search-backward-end history-search-end
-zle -N history-beginning-search-forward-end history-search-end
+#####################
+# HISTORY           #
+#####################
+[ -z "$HISTFILE" ] && HISTFILE="$HOME/.zsh_history"
+HISTSIZE=290000
+SAVEHIST=$HISTSIZE
 
-### Set variables
-#################
+#####################
+# SETOPT            #
+#####################
+setopt extended_history       # record timestamp of command in HISTFILE
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_all_dups   # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_verify            # show command with history expansion to user before running it
+setopt inc_append_history     # add commands to HISTFILE in order of execution
+setopt share_history          # share command history data
+setopt always_to_end          # cursor moved to the end in full completion
+setopt hash_list_all          # hash everything before completion
+# setopt completealiases        # complete alisases
+setopt always_to_end          # when completing from the middle of a word, move the cursor to the end of the word
+setopt complete_in_word       # allow completion from within a word/phrase
+setopt nocorrect                # spelling correction for commands
+setopt list_ambiguous         # complete as much of a completion until it gets ambiguous.
+setopt nolisttypes
+setopt listpacked
+setopt automenu
+setopt vi
+
+# Automatic ls when changing directory
+# removed --classify
+chpwd() exa --git --icons --group-directories-first --time-style=long-iso --group --color-scale
+#####################
+# ENV VARIABLE      #
+#####################
+export EDITOR='nvim'
+export VISUAL=$EDITOR
+export PAGER='less'
+export SHELL='/bin/zsh'
+#export LANG='en_GB.UTF-8'
+#export LC_ALL='en_GB.UTF-8'
+export BAT_THEME="gruvbox"
+
 PATH="/usr/local/bin:/usr/local/sbin/:$PATH"
 path+=('/usr/local/bin')
 path+=('$HOME/.local/bin')
@@ -60,213 +205,25 @@ export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="$HOME/.poetry/bin:$PATH"
 
+#####################
+# COLORING          #
+#####################
+autoload colors && colors
 
-HISTFILE=$HOME/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
-HOSTNAME="`hostname`"
-LS_COLORS='rs=0:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:';
-
-### Load colors
-###############
-autoload colors zsh/terminfo
-if [[ "$terminfo[colors]" -ge 8 ]]; then
-   colors
-fi
-for color in RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
-   eval PR_$color='%{$terminfo[bold]$fg[${(L)color}]%}'
-   eval PR_LIGHT_$color='%{$fg[${(L)color}]%}'
-   (( count = $count + 1 ))
-done
-
-### Set Colors to use in in the script
-#############
-# Normal Colors
-Black='\e[0;30m'        # Black
-Red='\e[0;31m'          # Red
-Green='\e[0;32m'        # Green
-Yellow='\e[0;33m'       # Yellow
-Blue='\e[0;34m'         # Blue
-Purple='\e[0;35m'       # Purple
-Cyan='\e[0;36m'         # Cyan
-White='\e[0;37m'        # White
-
-# Bold
-BBlack='\e[1;30m'       # Black
-BRed='\e[1;31m'         # Red
-BGreen='\e[1;32m'       # Green
-BYellow='\e[1;33m'      # Yellow
-BBlue='\e[1;34m'        # Blue
-BPurple='\e[1;35m'      # Purple
-BCyan='\e[1;36m'        # Cyan
-BWhite='\e[1;37m'       # White
-
-# Background
-On_Black='\e[40m'       # Black
-On_Red='\e[41m'         # Red
-On_Green='\e[42m'       # Green
-On_Yellow='\e[43m'      # Yellow
-On_Blue='\e[44m'        # Blue
-On_Purple='\e[45m'      # Purple
-On_Cyan='\e[46m'        # Cyan
-On_White='\e[47m'       # White
-
-NC="\e[m"               # Color Reset
-
-#### Set prompt
-###############
-#PR_NO_COLOR="%{$terminfo[sgr0]%}"
-#PS1="[%(!.${PR_RED}%n.$PR_LIGHT_YELLOW%n)%(!.${PR_LIGHT_YELLOW}@.$PR_RED@)$PR_NO_COLOR%(!.${PR_LIGHT_RED}%U%m%u.${PR_LIGHT_GREEN}%U%m%u)$PR_NO_COLOR:%(!.${PR_RED}%2c.${PR_BLUE}%2c)$PR_NO_COLOR]%(?..[${PR_LIGHT_RED}%?$PR_NO_COLOR])%(!.${PR_LIGHT_RED}#.${PR_LIGHT_GREEN}$) "
-#RPS1="$PR_LIGHT_YELLOW(%D{%m-%d %H:%M})$PR_NO_COLOR"
-#unsetopt ALL_EXPORT
-SPACESHIP_PROMPT_ADD_NEWLINE=false
-SPACESHIP_PROMPT_SEPARATE_LINE=false
-SPACESHIP_PROMPT_DEFAULT_PREFIX=""
-#SPACESHIP_CHAR_SYMBOL=❯
-SPACESHIP_CHAR_SUFFIX=" "
-SPACESHIP_GIT_PREFIX=""
-SPACESHIP_GIT_STATUS_STASHED=""
-#SPACESHIP_HG_SHOW=false
-SPACESHIP_PACKAGE_SHOW=false
-SPACESHIP_NODE_SHOW=false
-SPACESHIP_RUBY_SHOW=false
-SPACESHIP_ELM_SHOW=false
-SPACESHIP_ELIXIR_SHOW=false
-SPACESHIP_XCODE_SHOW_LOCAL=false
-SPACESHIP_SWIFT_SHOW_LOCAL=false
-SPACESHIP_GOLANG_SHOW=false
-SPACESHIP_PHP_SHOW=false
-SPACESHIP_RUST_SHOW=false
-SPACESHIP_JULIA_SHOW=false
-SPACESHIP_DOCKER_SHOW=false
-SPACESHIP_DOCKER_CONTEXT_SHOW=false
-#SPACESHIP_AWS_SHOW=false
-#SPACESHIP_CONDA_SHOW=false
-#SPACESHIP_VENV_SHOW=false
-SPACESHIP_PYENV_SHOW=false
-#SPACESHIP_DOTNET_SHOW=false
-#SPACESHIP_EMBER_SHOW=false
-#SPACESHIP_KUBECONTEXT_SHOW=false
-#SPACESHIP_TERRAFORM_SHOW=false
-#SPACESHIP_TERRAFORM_SHOW=false
-#SPACESHIP_VI_MODE_SHOW=false
-#SPACESHIP_JOBS_SHOW=false
-
-### set common functions
-#############
-
-function my_ip() # Get IP adress.
-{
-   curl ifconfig.co
-}
-
-# Find a file with a pattern in name:
-function ff()
-{
-    find . -type f -iname '*'"$*"'*' -ls ;
-}
-
-function sysinfo()   # Get current host related info.
-{
-    echo -e "\n${BRed}System Informations:$NC " ; uname -a
-    echo -e "\n${BRed}Online User:$NC " ; w -hs |
-             cut -d " " -f1 | sort | uniq
-    echo -e "\n${BRed}Date :$NC " ; date
-    echo -e "\n${BRed}Server stats :$NC " ; uptime
-    echo -e "\n${BRed}Memory stats :$NC " ; free
-    echo -e "\n${BRed}Public IP Address :$NC " ; my_ip
-    echo -e "\n${BRed}Open connections :$NC "; netstat -pan --inet;
-    echo -e "\n${BRed}CPU info :$NC "; cat /proc/cpuinfo ;
-    echo -e "\n"
-}
-
-function extract {
- if [ -z "$1" ]; then
-    # display usage if no parameters given
-    echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
- else
-    if [ -f $1 ] ; then
-        # NAME=${1%.*}
-        # mkdir $NAME && cd $NAME
-        case $1 in
-          *.tar.bz2)   tar xvjf ../$1    ;;
-          *.tar.gz)    tar xvzf ../$1    ;;
-          *.tar.xz)    tar xvJf ../$1    ;;
-          *.lzma)      unlzma ../$1      ;;
-          *.bz2)       bunzip2 ../$1     ;;
-          *.rar)       unrar x -ad ../$1 ;;
-          *.gz)        gunzip ../$1      ;;
-          *.tar)       tar xvf ../$1     ;;
-          *.tbz2)      tar xvjf ../$1    ;;
-          *.tgz)       tar xvzf ../$1    ;;
-          *.zip)       unzip ../$1       ;;
-          *.Z)         uncompress ../$1  ;;
-          *.7z)        7z x ../$1        ;;
-          *.xz)        unxz ../$1        ;;
-          *.exe)       cabextract ../$1  ;;
-          *)           echo "extract: '$1' - unknown archive method" ;;
-        esac
-    else
-        echo "$1 - file does not exist"
-    fi
-fi
-}
-
-# Creates an archive (*.tar.gz) from given directory.
-function maketar() { tar cvzf "${1%%/}.tar.gz"  "${1%%/}/"; }
-
-# Create a ZIP archive of a file or folder.
-function makezip() { zip -r "${1%%/}.zip" "$1" ; }
-
-
-function my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,bsdtime,command ; }
-
-mcd () {
-    mkdir -p $1
-    cd $1
-}
-
-# less wrapper
-man() {
-    LESS_TERMCAP_md=$'\e[01;31m' \
-    LESS_TERMCAP_me=$'\e[0m' \
-    LESS_TERMCAP_se=$'\e[0m' \
-    LESS_TERMCAP_so=$'\e[01;44;33m' \
-    LESS_TERMCAP_ue=$'\e[0m' \
-    LESS_TERMCAP_us=$'\e[01;32m' \
-    command man "$@"
-}
-
-### Set alias
-#############
-alias cls="clear"
+#####################
+# ALIASES           #
+#####################
+#source $HOME/.zsh_aliases
 alias ..="cd .."
-alias cd..="cd .."
-alias ll="ls -lisa --color=auto"
-alias home="cd ~"
-#alias df="df -ahiT --total"
-alias mkdir="mkdir -pv"
-alias mkfile="touch"
-#alias rm="rm -rfi"
-alias userlist="cut -d: -f1 /etc/passwd"
-alias ls="ls -CF --color=auto"
-alias lsl="ls -lhFA | less"
-alias free="free -mt"
-#alias du="du -ach | sort -h"
-alias ps="ps auxf"
 alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
-alias wget="wget -c"
-alias histg="history | grep"
 alias myip="curl http://ipecho.net/plain; echo"
-alias logs="find /var/log -type f -exec file {} \; | grep 'text' | cut -d' ' -f1 | sed -e's/:$//g' | grep -v '[0-9]$' | xargs tail -f"
-alias folders='find . -maxdepth 1 -type d -print0 | xargs -0 du -sk | sort -rn'
-alias grep='grep --color=auto'
-alias zshconfig="mate ~/.zshrc"
+alias ls="exa --git --icons --group-directories-first --time-style=long-iso --group --color-scale"
 alias vim=nvim
 alias vi=nvim
 alias myconfig='/usr/bin/git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
 alias syu='sudo apt update && sudo apt upgrade'
 alias -- -='cd -'
+#alias python=python3
 
 alias ta='tmux attach -t'
 alias tad='tmux attach -d -t'
@@ -277,154 +234,48 @@ alias tkss='tmux kill-session -t'
 
 alias poetry=$HOME/.poetry/bin/poetry
 
-### Bind keys
-#############
-autoload -U compinit
-compinit
-bindkey "^?" backward-delete-char
-bindkey '^[OH' beginning-of-line
-bindkey '^[OF' end-of-line
-bindkey '^[[5~' up-line-or-history
-bindkey '^[[6~' down-line-or-history
-bindkey "^[[A" history-beginning-search-backward-end
-bindkey "^[[B" history-beginning-search-forward-end
-bindkey "^r" history-incremental-search-backward
-bindkey ' ' magic-space    # also do history expansion on space
-bindkey '^I' complete-word # complete on tab, leave expansion to _expand
-zstyle ':completion::complete:*' use-cache on
-zstyle ':completion::complete:*' cache-path ~/.zsh/cache/$HOST
+#####################
+# FANCY-CTRL-Z      #
+#####################
+function fg-fzf() {
+	job="$(jobs | fzf -0 -1 | sed -E 's/\[(.+)\].*/\1/')" && echo '' && fg %$job
+}
+function fancy-ctrl-z () {
+	if [[ $#BUFFER -eq 0 ]]; then
+		BUFFER=" fg-fzf"
+		zle accept-line -w
+	else
+		zle push-input -w
+		zle clear-screen -w
+	fi
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
 
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character to insert%s'
-zstyle ':completion:*' menu select=1 _complete _ignored _approximate
-zstyle -e ':completion:*:approximate:*' max-errors \
-    'reply=( $(( ($#PREFIX+$#SUFFIX)/2 )) numeric )'
-zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+#####################
+# FZF SETTINGS      #
+#####################
+export FZF_DEFAULT_OPTS="
+--ansi
+--layout=default
+--info=inline
+--height=50%
+--multi
+--preview-window=right:50%
+--preview-window=sharp
+--preview-window=cycle
+--preview '([[ -f {} ]] && (bat --style=numbers --color=always --theme=gruvbox --line-range :500 {} || cat {})) || ([[ -d {} ]] && (tree -C {} | less)) || echo {} 2> /dev/null | head -200'
+--prompt='λ -> '
+--pointer='|>'
+--marker='✓'
+--bind 'ctrl-e:execute(nvim {} < /dev/tty > /dev/tty 2>&1)' > selected
+--bind 'ctrl-v:execute(code {+})'"
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-#romkatv bindkeys
-# If NumLock is off, translate keys to make them appear the same as with NumLock on.
-bindkey -s '^[OM' '^M'  # enter
-bindkey -s '^[Ok' '+'
-bindkey -s '^[Om' '-'
-bindkey -s '^[Oj' '*'
-bindkey -s '^[Oo' '/'
-bindkey -s '^[OX' '='
-
-# If someone switches our terminal to application mode (smkx), translate keys to make
-# them appear the same as in raw mode (rmkx).
-bindkey -s '^[OH' '^[[H'  # home
-bindkey -s '^[OF' '^[[F'  # end
-bindkey -s '^[OA' '^[[A'  # up
-bindkey -s '^[OB' '^[[B'  # down
-bindkey -s '^[OD' '^[[D'  # left
-bindkey -s '^[OC' '^[[C'  # right
-
-# TTY sends different key codes. Translate them to regular.
-bindkey -s '^[[1~' '^[[H'  # home
-bindkey -s '^[[4~' '^[[F'  # end
-
-# Now bind Home, End and a bunch of other standard things:
-bindkey '^?'      backward-delete-char          # bs         delete one char backward
-bindkey '^[[3~'   delete-char                   # delete     delete one char forward
-bindkey '^[[H'    beginning-of-line             # home       go to the beginning of line
-bindkey '^[[F'    end-of-line                   # end        go to the end of line
-bindkey '^[[1;5C' forward-word                  # ctrl+right go forward one word
-bindkey '^[[1;5D' backward-word                 # ctrl+left  go backward one word
-bindkey '^H'      backward-kill-word            # ctrl+bs    delete previous word
-bindkey '^[[3;5~' kill-word                     # ctrl+del   delete next word
-bindkey '^J'      backward-kill-line            # ctrl+j     delete everything before cursor
-bindkey '^[[D'    backward-char                 # left       move cursor one char backward
-bindkey '^[[C'    forward-char                  # right      move cursor one char forward
-bindkey '^[[A'    up-line-or-beginning-search   # up         prev command in history
-bindkey '^[[B'    down-line-or-beginning-search # down       next command in history
-
-# Additional lines to make work the key bindings
-autoload -Uz up-line-or-beginning-search
-autoload -Uz down-line-or-beginning-search
-zle -N up-line-or-beginning-search
-zle -N down-line-or-beginning-search
-
-
-# Completion Styles
-
-# list of completers to use
-zstyle ':completion:*::::' completer _expand _complete _ignored _approximate
-
-# allow one error for every three characters typed in approximate completer
-zstyle -e ':completion:*:approximate:*' max-errors \
-    'reply=( $(( ($#PREFIX+$#SUFFIX)/2 )) numeric )'
-
-# insert all expansions for expand completer
-zstyle ':completion:*:expand:*' tag-order all-expansions
-
-# formatting and messages
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*:descriptions' format '%B%d%b'
-zstyle ':completion:*:messages' format '%d'
-zstyle ':completion:*:warnings' format 'No matches for: %d'
-zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
-zstyle ':completion:*' group-name ''
-
-# match uppercase from lowercase
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-
-# offer indexes before parameters in subscripts
-zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
-
-# command for process lists, the local web server details and host completion
-# on processes completion complete all user processes
-zstyle ':completion:*:processes' command 'ps -au$USER'
-
-## add colors to processes for kill completion
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
-
-#zstyle ':completion:*:processes' command 'ps -o pid,s,nice,stime,args'
-#zstyle ':completion:*:urls' local 'www' '/var/www/htdocs' 'public_html'
-#
-#NEW completion:
-# 1. All /etc/hosts hostnames are in autocomplete
-# 2. If you have a comment in /etc/hosts like #%foobar.domain,
-#    then foobar.domain will show up in autocomplete!
-zstyle ':completion:*' hosts $(awk '/^[^#]/ {print $2 $3" "$4" "$5}' /etc/hosts | grep -v ip6- && grep "^#%" /etc/hosts | awk -F% '{print $2}')
-# Filename suffixes to ignore during completion (except after rm command)
-zstyle ':completion:*:*:(^rm):*:*files' ignored-patterns '*?.o' '*?.c~' \
-    '*?.old' '*?.pro'
-# the same for old style completion
-#fignore=(.o .c~ .old .pro)
-
-# ignore completion functions (until the _ignored completer)
-zstyle ':completion:*:functions' ignored-patterns '_*'
-zstyle ':completion:*:*:*:users' ignored-patterns \
-        adm apache bin daemon games gdm halt ident junkbust lp mail mailnull \
-        named news nfsnobody nobody nscd ntp operator pcap postgres radvd \
-        rpc rpcuser rpm shutdown squid sshd sync uucp vcsa xfs avahi-autoipd\
-        avahi backup messagebus beagleindex debian-tor dhcp dnsmasq fetchmail\
-        firebird gnats haldaemon hplip irc klog list man cupsys postfix\
-        proxy syslog www-data mldonkey sys snort
-# SSH Completion
-zstyle ':completion:*:scp:*' tag-order \
-   files users 'hosts:-host hosts:-domain:domain hosts:-ipaddr"IP\ Address *'
-zstyle ':completion:*:scp:*' group-order \
-   files all-files users hosts-domain hosts-host hosts-ipaddr
-zstyle ':completion:*:ssh:*' tag-order \
-   users 'hosts:-host hosts:-domain:domain hosts:-ipaddr"IP\ Address *'
-zstyle ':completion:*:ssh:*' group-order \
-   hosts-domain hosts-host users hosts-ipaddr
-zstyle '*' single-ignored show
-
-# Install plugins if there are plugins that have not been installed
-if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
-fi
-
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
-
-# >>> conda initialize >>>
+#####################
+# CONDA SETTINGS       #
+#####################
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/home/mgajewskik/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
@@ -437,21 +288,32 @@ else
     fi
 fi
 unset __conda_setup
-# <<< conda initialize <<<
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+#####################
+# GO SETTINGS       #
+#####################
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=$HOME/Dev/go
 
-# --files: List files that would be searched but do not search
-# --no-ignore: Do not respect .gitignore, etc...
-# --hidden: Search hidden files and folders
-# --follow: Follow symlinks
-# --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
-export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi"'
-# export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi"'
+######################
+## FLUTTER SETTINGS  #
+######################
+#export PATH="$PATH:$HOME/Dev/flutter/bin"
 
-export BAT_THEME="Solarized (light)"
-[[ /usr/bin/kubectl ]] && source <(kubectl completion zsh)
+############################
+## PYENV SETUP #
+############################
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
 
-# Then, source plugins and add commands to $PATH
-#zplug load --verbose >/dev/null
-zplug load
+#####################
+# P10K SETTINGS     #
+#####################
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+#####################
+# RVM VARIABLE      #
+#####################
+export PATH="$PATH:$HOME/.rvm/bin"
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
