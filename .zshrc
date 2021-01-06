@@ -38,10 +38,10 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 #####################
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
-# AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-zinit ice wait"0a" lucid atload"_zsh_autosuggest_start"
-zinit light zsh-users/zsh-autosuggestions
+ ##AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
+#ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+#zinit ice wait"0a" lucid atload"_zsh_autosuggest_start"
+#zinit light zsh-users/zsh-autosuggestions
 # ENHANCD
 zinit ice wait"0b" lucid
 zinit light b4b4r07/enhancd
@@ -107,7 +107,7 @@ alias man=batman.sh
 zinit ice from"gh-r" as"program" mv"ripgrep* -> ripgrep" pick"ripgrep/rg"
 zinit light BurntSushi/ripgrep
 ## NEOVIM
-#zinit ice from"gh-r" as"program" bpick"*appimage*" ver"stable" mv"nvim* -> nvim" pick"nvim"
+#zinit ice from"gh-r" as"program" bpick"*appimage*" ver"nightly" mv"nvim* -> nvim" pick"nvim"
 #zinit light neovim/neovim
 # FORGIT
 # ga - git add
@@ -191,19 +191,16 @@ export SHELL='/bin/zsh'
 #export LC_ALL='en_GB.UTF-8'
 export BAT_THEME="gruvbox"
 
-PATH="/usr/local/bin:/usr/local/sbin/:$PATH"
-path+=('/usr/local/bin')
-path+=('$HOME/.local/bin')
-path+=('$HOME/.poetry/bin')
-path+=('/usr/local/go/bin')
-path+=('$HOME/.cargo/bin')
-export PATH
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-export PATH="$HOME/.poetry/bin:$PATH"
+#PATH="/usr/local/bin:/usr/local/sbin/:$PATH"
+export PATH=$PATH:/usr/local/bin
+export PATH=$PATH:/usr/local/sbin
+export PATH=$PATH:$HOME/.local/bin
+export PATH=$PATH:$HOME/.cargo/bin
+export PATH=$PATH:$HOME/bin
+#path+=('/usr/local/bin')
+#path+=('$HOME/.local/bin')
+#path+=('$HOME/.cargo/bin')
+#export PATH
 
 #####################
 # COLORING          #
@@ -221,9 +218,12 @@ alias ls="exa --git --icons --group-directories-first --time-style=long-iso --gr
 alias vim=nvim
 alias vi=nvim
 alias myconfig='/usr/bin/git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
-alias syu='sudo apt update && sudo apt upgrade'
 alias -- -='cd -'
 #alias python=python3
+alias cht="cht.sh"
+
+alias syu='sudo apt update && sudo apt upgrade'
+alias srconfig='source ~/.zshrc'
 
 alias ta='tmux attach -t'
 alias tad='tmux attach -d -t'
@@ -257,7 +257,8 @@ bindkey '^Z' fancy-ctrl-z
 #####################
 export FZF_DEFAULT_OPTS="
 --ansi
---layout=default
+--no-sort
+--layout=reverse
 --info=inline
 --height=50%
 --multi
@@ -270,7 +271,7 @@ export FZF_DEFAULT_OPTS="
 --marker='✓'
 --bind 'ctrl-e:execute(nvim {} < /dev/tty > /dev/tty 2>&1)' > selected
 --bind 'ctrl-v:execute(code {+})'"
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,.tox}/*" 2> /dev/null'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 #####################
@@ -292,28 +293,27 @@ unset __conda_setup
 #####################
 # GO SETTINGS       #
 #####################
-export PATH=$PATH:/usr/local/go/bin
-export GOPATH=$HOME/Dev/go
-
-######################
-## FLUTTER SETTINGS  #
-######################
-#export PATH="$PATH:$HOME/Dev/flutter/bin"
+export GOPATH=$HOME/go
+export GOBIN=$HOME/go/bin
+export PATH=$PATH:$GOPATH/bin:/usr/local/go/bin
+#export GOPATH=$GOPATH:$HOME/code
 
 ############################
-## PYENV SETUP #
+## PYENV SETTINGS          #
 ############################
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
+
+############################
+## POETRY SETTINGS         #
+############################
+export PATH="$HOME/.poetry/bin:$PATH"
 
 #####################
 # P10K SETTINGS     #
 #####################
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
-
-#####################
-# RVM VARIABLE      #
-#####################
-export PATH="$PATH:$HOME/.rvm/bin"
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*

@@ -61,7 +61,7 @@ if has('nvim')
 endif
 
 " disable polyglot for certain filetypes
-let g:polyglot_disabled = ['csv']
+let g:polyglot_disabled = ['csv', 'go']
 
 " List of plugins to install with Plug
 call plug#begin('~/.vim/plugged')
@@ -89,6 +89,7 @@ Plug 'justinmk/vim-sneak'
 Plug 'cocopon/vaffle.vim'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'kyazdani42/nvim-tree.lua'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 call plug#end()
 
@@ -143,10 +144,6 @@ let g:diagnostic_enable_virtual_text = 1
   local on_attach = function(_, bufnr)
     require('completion').on_attach() local opts = { noremap=true, silent=true }
     print("LSP started.");
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
   end
 
   local servers = {'jsonls', 'vimls', 'dockerls', 'sqlls', 'bashls'}
@@ -166,12 +163,45 @@ let g:diagnostic_enable_virtual_text = 1
     },
     on_attach = on_attach,
   }
+
+  nvim_lsp.gopls.setup {
+    cmd = { "gopls", "serve" };
+    filetypes = { "go", "gomod" };
+    root_dir = nvim_lsp.util.root_pattern('go.mod', '.git');
+    settings = {
+      gopls = {
+        analyses = {
+          unusedparams = true,
+        },
+        staticcheck = true,
+      },
+    },
+    on_attach = on_attach,
+  }
 EOF
 
 sign define LspDiagnosticsErrorSign text=✖
 sign define LspDiagnosticsWarningSign text=⚠
 sign define LspDiagnosticsInformationSign text=ℹ
 sign define LspDiagnosticsHintSign text=➤
+
+
+    "vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+    "vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+    "vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+    "vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+
+
+    "root_dir = nvim_lsp.util.root_pattern('.git');
+    "cmd = { "gopls", "serve" };
+    "settings = {
+      "gopls = {
+        "analyses = {
+          "unusedparams = true,
+        "},
+        "staticcheck = true,
+      "},
+    "},
 
     "vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
     "vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -193,6 +223,35 @@ sign define LspDiagnosticsHintSign text=➤
 
 " possible value: 'UltiSnips', 'Neosnippet', 'vim-vsnip', 'snippets.nvim'
 let g:completion_enable_snippet = 'snippets.nvim'
+
+" --- vim go (polyglot) settings.
+let g:go_def_mapping_enabled = 0
+let g:go_fmt_command = "goimports"
+let g:go_fmt_autosave = 1
+let g:go_fmt_command = "gofmt"
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
+let g:go_doc_keywordprg_enabled = 0
+let g:go_doc_popup_window = 1
+let g:go_list_type = "quickfix"
+"let g:go_auto_sameids = 1
+let g:go_auto_type_info = 1
+let g:go_addtags_transform = 'camelcase'
+let g:go_gocode_unimported_packages = 1
+
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_types = 1
+let g:go_highlight_function_parameters = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_generate_tags = 1
+let g:go_highlight_format_strings = 1
+let g:go_highlight_variable_declarations = 1
 
 let g:vim_markdown_conceal = 0
 let g:vim_markdown_conceal_code_blocks = 0
@@ -320,7 +379,13 @@ nnoremap <leader>l :wincmd l<CR>
 nnoremap <leader>tn :tabnew<CR>
 nnoremap <leader>tc :tabclose<CR>
 nnoremap <leader>tm :tabmove<space>
+" managing terminal
+"tnoremap jj <C-\><C-n>
+"tnoremap <Esc> <C-\><C-n>
 nnoremap <leader>tt :tabnew<CR>:terminal<CR>i
+nnoremap <leader>th :call TermToggle(12)<CR>
+"inoremap <leader>th <Esc>:call TermToggle(12)<CR>
+tnoremap <leader>th <C-\><C-n>:call TermToggle(12)<CR>
 " leader + number is now used to move through tabs
 nnoremap <leader>1 1gt
 nnoremap <leader>2 2gt
@@ -437,6 +502,18 @@ nnoremap <leader>dn :lua vim.lsp.diagnostic.goto_next()<CR>
 nnoremap <leader>dp :lua vim.lsp.diagnostic.goto_prev()<CR>
 nnoremap <leader>sd :lua vim.lsp.diagnostic.set_loclist()<CR>
 
+" Shortcuts for vim-go mode
+autocmd FileType go nmap <buffer> <leader>gd <plug>(go-def)
+autocmd FileType go nmap <buffer> <leader>ge :vsplit<CR><plug>(go-def)
+autocmd FileType go nmap <buffer> <leader>gr <plug>(go-referrers)
+autocmd FileType go nmap <buffer> <leader>gt <plug>(go-test)
+autocmd FileType go nmap <buffer> <leader>gi <plug>(go-import)
+autocmd FileType go nmap <buffer> <leader>rn <plug>(go-rename)
+autocmd FileType go nmap <buffer> <leader>at <plug>(go-test)
+autocmd FileType go nmap <buffer> <leader>ar <plug>(go-run)
+"au filetype go inoremap <buffer> . .<C-x><C-o>
+autocmd FileType go setlocal omnifunc=v:lua.vim.lsp.omnifunc
+
 " Sweet Sweet FuGITive
 nmap <leader>gh :diffget //3<CR>
 nmap <leader>gf :diffget //2<CR>
@@ -455,7 +532,8 @@ map T <Plug>Sneak_T
 " Scripts and defined commands
 " ============================================================================
 "
-command! V :vnew ~/.config/nvim/init.vim
+command! Evim :vnew ~/.config/nvim/init.vim
+command! Ezsh :vnew ~/.zshrc
 command! S :source $MYVIMRC
 
 " Define your own Find command to use ripgrep inside of fzf
@@ -564,6 +642,29 @@ endfunction
 :command! RemoveQFItem :call RemoveQFItem()
 " Use map <buffer> to only map dd in the quickfix window. Requires +localmap
 autocmd FileType qf map <buffer> dd :RemoveQFItem<cr>
+
+" Terminal Function
+let g:term_buf = 0
+let g:term_win = 0
+function! TermToggle(height)
+    if win_gotoid(g:term_win)
+        hide
+    else
+        botright new
+        exec "resize " . a:height
+        try
+            exec "buffer " . g:term_buf
+        catch
+            call termopen($SHELL, {"detach": 0})
+            let g:term_buf = bufnr("")
+            set nonumber
+            set norelativenumber
+            set signcolumn=no
+        endtry
+        startinsert!
+        let g:term_win = win_getid()
+    endif
+endfunction
 
 " Config for rainbow csv
 autocmd BufWinEnter *.csv set buftype=nowrite | :%s/,/|/g

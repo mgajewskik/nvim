@@ -2,6 +2,8 @@
 
 This repo contains my configs. The usage with scripts can be found below.
 
+To update all modified files: `myconfig add -u`
+
 ## First setup
 
 ```bash
