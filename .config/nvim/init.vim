@@ -4,12 +4,13 @@
 "
 syntax on
 syntax enable
+filetype plugin indent on
 
 set ma
 set cursorline
 " set cursorcolumn
 set clipboard+=unnamedplus
-set t_Co=256 " 256 colors in the terminal
+"set t_Co=256 " 256 colors in the terminal
 set noerrorbells
 set tabstop=4 softtabstop=4 " number of spaces per tab
 set shiftwidth=4
@@ -61,7 +62,7 @@ if has('nvim')
 endif
 
 " disable polyglot for certain filetypes
-let g:polyglot_disabled = ['csv', 'go']
+"let g:polyglot_disabled = ['csv', 'go']
 
 " List of plugins to install with Plug
 call plug#begin('~/.vim/plugged')
@@ -73,23 +74,24 @@ Plug 'preservim/nerdcommenter'
 Plug 'lifepillar/vim-gruvbox8'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+"Plug 'ojroques/nvim-lspfuzzy'
 Plug 'stsewd/fzf-checkout.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-signify'
 Plug 'mbbill/undotree'
 Plug 'rbong/vim-crystalline'
-Plug 'sheerun/vim-polyglot'
+"Plug 'sheerun/vim-polyglot'
 Plug 'ThePrimeagen/vim-be-good'
 Plug 'luochen1990/rainbow'
-Plug 'psliwka/vim-smoothie'
 Plug 'Yggdroot/indentLine'
 Plug 'mechatroner/rainbow_csv'
 Plug 'tmux-plugins/vim-tmux-focus-events'
 Plug 'justinmk/vim-sneak'
-Plug 'cocopon/vaffle.vim'
+"Plug 'cocopon/vaffle.vim'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 call plug#end()
 
@@ -102,10 +104,10 @@ let g:gruvbox_invert_selection='0'
 
 set noshowmode
 colorscheme gruvbox8
-set background=dark
+"set background=dark
 
 set completeopt=menuone,noinsert,noselect
-let g:completion_enable_auto_popup = 1
+let g:completion_enable_auto_popup = 0
 let g:completion_auto_change_source = 1
 let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
 let g:completion_chain_complete_list = {
@@ -146,22 +148,25 @@ let g:diagnostic_enable_virtual_text = 1
     print("LSP started.");
   end
 
-  local servers = {'jsonls', 'vimls', 'dockerls', 'sqlls', 'bashls'}
-  for _, lsp in ipairs(servers) do
-    nvim_lsp[lsp].setup {
-      on_attach = on_attach,
-    }
-  end
-
-  nvim_lsp.pyls.setup {
-    enable = true,
-    plugins = {
-      pyls_mypy = {
-        enabled = true,
-        live_mode = false
-      }
+  nvim_lsp.pyright.setup {
+    cmd = { "pyright-langserver", "--stdio" };
+    filetypes = { "python" };
+    settings = {
+      python = {
+        analysis = {
+          autoSearchPaths = true,
+          useLibraryCodeForTypes = true
+        },
+        linting = {
+          enabled = true,
+          pylintEnabled = true
+        },
+        formatting = {
+          enabled = true,
+          provider = black
+        },
+      },
     },
-    on_attach = on_attach,
   }
 
   nvim_lsp.gopls.setup {
@@ -180,10 +185,90 @@ let g:diagnostic_enable_virtual_text = 1
   }
 EOF
 
+"lua require('lspfuzzy').setup {}
+
 sign define LspDiagnosticsErrorSign text=✖
 sign define LspDiagnosticsWarningSign text=⚠
 sign define LspDiagnosticsInformationSign text=ℹ
 sign define LspDiagnosticsHintSign text=➤
+
+:lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "maintained",
+  highlight = {
+    enable = true,
+  },
+  indent = {
+    enable = false
+  },
+}
+EOF
+
+
+  "local servers = {'jsonls', 'dockerls', 'sqlls', 'bashls'}
+  "for _, lsp in ipairs(servers) do
+    "nvim_lsp[lsp].setup {
+      "on_attach = on_attach,
+    "}
+  "end
+
+
+  "nvim_lsp.pyls.setup {
+    "enable = true,
+    "plugins = {
+      "pyls_black = {
+        "enabled = true,
+      "},
+      "pyls_isort = {
+        "enabled = true,
+      "},
+    "},
+    "on_attach = on_attach,
+  "}
+
+
+  "nvim_lsp.pyls.setup {
+    "enable = true,
+    "plugins = {
+      "pyls_mypy = {
+        "enabled = true,
+        "live_mode = false
+      "}
+    "},
+    "on_attach = on_attach,
+  "}
+  "
+  "
+  "nvim_lsp.pyls.setup {
+    "enable = true,
+    "plugins = {
+      "pyls_mypy = {
+        "enabled = true,
+        "live_mode = false
+      "},
+      "pyls_black = {
+        "enabled = true,
+      "},
+      "pyls_isort = {
+        "enabled = true,
+      "},
+    "},
+    "on_attach = on_attach,
+  "}
+  "
+  "nvim_lsp.pyright.setup {
+    "cmd = { "pyright-langserver", "--stdio" };
+    "filetypes = { "python" };
+    "settings = {
+      "python = {
+        "analysis = {
+          "autoSearchPaths = true,
+          "useLibraryCodeForTypes = true
+        "},
+      "},
+    "},
+    "on_attach = on_attach,
+  "}
 
 
     "vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
@@ -253,9 +338,9 @@ let g:go_highlight_generate_tags = 1
 let g:go_highlight_format_strings = 1
 let g:go_highlight_variable_declarations = 1
 
-let g:vim_markdown_conceal = 0
-let g:vim_markdown_conceal_code_blocks = 0
-let g:markdown_fenced_languages = ['sql', 'python', 'bash', 'go']
+"let g:vim_markdown_conceal = 0
+"let g:vim_markdown_conceal_code_blocks = 0
+"let g:markdown_fenced_languages = ['sql', 'python', 'bash', 'go']
 
 " indent guides toggle on
 let g:indent_guides_enable_on_vim_startup = 1
@@ -455,7 +540,7 @@ nmap <leader>cc :NERDCommenterComment<CR>
 nmap <leader>c<space> :NERDCommenterToggle<CR>
 " Trees shortcut
 nnoremap <leader>u :UndotreeShow<CR>
-nnoremap <leader>e :LuaTreeToggle<CR>
+nnoremap <leader>e :NvimTreeToggle<CR>
 " fzf shortcuts
 nnoremap cc :Commands<CR>
 nnoremap // :BLines<CR>
@@ -519,7 +604,7 @@ nmap <leader>gh :diffget //3<CR>
 nmap <leader>gf :diffget //2<CR>
 nmap <leader>gs :G<CR>
 nmap <leader>gv :Gvdiffsplit!<CR>
-nmap <leader>gc :Gcommit<CR>
+nmap <leader>gc :Git commit<CR>
 nmap <leader>gl :G log<CR>
 
 " Sneak mappings
@@ -535,6 +620,7 @@ map T <Plug>Sneak_T
 command! Evim :vnew ~/.config/nvim/init.vim
 command! Ezsh :vnew ~/.zshrc
 command! S :source $MYVIMRC
+command! Jfmt :%!jq .
 
 " Define your own Find command to use ripgrep inside of fzf
 " --column: Show column number
@@ -674,6 +760,7 @@ autocmd Filetype gitcommit setlocal spell textwidth=72
 "autocmd! bufwritepost init.vim source % " automatic vimrc file reload
 autocmd FileType json syntax match Comment +\/\/.\+$+
 autocmd BufEnter * lua require'completion'.on_attach()
+autocmd BufEnter * CompletionToggle
 "vim.api.nvim_command[[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()]]
 "autocmd BufWritePre *.py lua vim.lsp.buf.formatting_sync()
 

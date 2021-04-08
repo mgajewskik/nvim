@@ -213,6 +213,7 @@ autoload colors && colors
 #source $HOME/.zsh_aliases
 alias ..="cd .."
 alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+alias pskill="ps aux  |  grep -i csp_build  |  awk '{print $2}'  |  xargs sudo kill -9"
 alias myip="curl http://ipecho.net/plain; echo"
 alias ls="exa --git --icons --group-directories-first --time-style=long-iso --group --color-scale"
 alias vim=nvim
@@ -224,6 +225,7 @@ alias cht="cht.sh"
 
 alias syu='sudo apt update && sudo apt upgrade'
 alias srconfig='source ~/.zshrc'
+alias vpn='cd $HOME/MEGA/brytlyt/openvpn && sudo openvpn --config mgajewskik.brytlyt.com.ovpn --auth-user-pass'
 
 alias ta='tmux attach -t'
 alias tad='tmux attach -d -t'
@@ -233,6 +235,13 @@ alias tksv='tmux kill-server'
 alias tkss='tmux kill-session -t'
 
 alias poetry=$HOME/.poetry/bin/poetry
+
+#####################
+# DOCKER FUNC      #
+#####################
+docker-ip () { docker inspect "$@" | grep "IPAddress\": \"1" | grep -o "[0-9\.]*"| uniq | head -1; }
+logs () { docker logs -f --tail 100  "$@" ; }
+b () { docker exec -e COLUMNS="`tput cols`" -e LINES="`tput lines`"  -it "$@" bash; }
 
 #####################
 # FANCY-CTRL-Z      #
@@ -271,7 +280,7 @@ export FZF_DEFAULT_OPTS="
 --marker='✓'
 --bind 'ctrl-e:execute(nvim {} < /dev/tty > /dev/tty 2>&1)' > selected
 --bind 'ctrl-v:execute(code {+})'"
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,.tox}/*" 2> /dev/null'
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,.tox,venv}/*" 2> /dev/null'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 #####################
