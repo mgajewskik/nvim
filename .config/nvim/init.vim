@@ -82,7 +82,7 @@ Plug 'mbbill/undotree'
 Plug 'rbong/vim-crystalline'
 "Plug 'sheerun/vim-polyglot'
 Plug 'ThePrimeagen/vim-be-good'
-Plug 'luochen1990/rainbow'
+"Plug 'luochen1990/rainbow'
 Plug 'Yggdroot/indentLine'
 Plug 'mechatroner/rainbow_csv'
 Plug 'tmux-plugins/vim-tmux-focus-events'
@@ -92,6 +92,8 @@ Plug 'kyazdani42/nvim-web-devicons'
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'p00f/nvim-ts-rainbow'
+Plug 'kosayoda/nvim-lightbulb'
 
 call plug#end()
 
@@ -200,6 +202,10 @@ require'nvim-treesitter.configs'.setup {
   },
   indent = {
     enable = false
+  },
+  rainbow = {
+    enable = true,
+    extended_mode = true,
   },
 }
 EOF
@@ -351,8 +357,9 @@ let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 
 " fzf settings
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8, 'highlight': 'Comment' } }
-let $FZF_DEFAULT_OPTS="--ansi --preview-window 'right:60%' --layout reverse --preview 'bat --color=always --style=header,grid --line-range :300 {}' --bind ctrl-s:select-all"
-let FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi"'
+"let $FZF_DEFAULT_OPTS="--ansi --preview-window 'right:60%' --layout reverse --preview 'bat --color=always --style=header,grid --line-range :300 {}' --bind ctrl-s:select-all"
+"let FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi"'
+"let $FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git/*,.tox/*,venv/*,.pyi,.pyc}" 2> /dev/null'
 " let g:fzf_preview_window = ['up:60%']
 " CTRL-A CTRL-Q to select all and build quickfix list
 
@@ -551,7 +558,8 @@ nnoremap <Leader>b :Buffer<CR>
 nnoremap <Leader>` :Buffer<CR>
 nnoremap <Leader>sc :Commits<CR>
 nnoremap <Leader>rf :Files ~/<CR>
-nnoremap <leader>f :ProjectFiles<CR>
+nnoremap <leader>pf :ProjectFiles<CR>
+nnoremap <leader>f :GFiles<CR>
 nnoremap <leader>sb :GBranches<CR>
 nnoremap <leader>st :GTags<CR>
 " Completion and snippets
@@ -761,6 +769,7 @@ autocmd Filetype gitcommit setlocal spell textwidth=72
 autocmd FileType json syntax match Comment +\/\/.\+$+
 autocmd BufEnter * lua require'completion'.on_attach()
 autocmd BufEnter * CompletionToggle
+autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()
 "vim.api.nvim_command[[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()]]
 "autocmd BufWritePre *.py lua vim.lsp.buf.formatting_sync()
 
