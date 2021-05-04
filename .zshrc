@@ -157,7 +157,7 @@ export PAGER='less'
 export SHELL='/bin/zsh'
 #export LANG='en_GB.UTF-8'
 #export LC_ALL='en_GB.UTF-8'
-export BAT_THEME="gruvbox"
+export BAT_THEME="gruvbox-dark"
 
 #PATH="/usr/local/bin:/usr/local/sbin/:$PATH"
 export PATH=$PATH:/usr/local/bin
@@ -195,6 +195,7 @@ alias syu='sudo apt update && sudo apt upgrade'
 alias srconfig='source ~/.zshrc'
 alias vpn='cd $HOME/MEGA/brytlyt/openvpn && sudo openvpn --config mgajewskik.brytlyt.com.ovpn --auth-user-pass'
 alias s76=system76-power
+alias om=optimus-manager
 
 alias ta='tmux attach -t'
 alias tad='tmux attach -d -t'
@@ -203,7 +204,7 @@ alias tl='tmux list-sessions'
 alias tksv='tmux kill-server'
 alias tkss='tmux kill-session -t'
 
-alias poetry=$HOME/.poetry/bin/poetry
+#alias poetry=$HOME/.poetry/bin/poetry
 
 #####################
 # DOCKER FUNC      #

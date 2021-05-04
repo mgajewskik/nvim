@@ -69,23 +69,38 @@ colors:
 
 background_opacity: 1
 
-# Consolas
+## Consolas
+#font:
+  #normal:
+    #family: "Consolas"
+    #style: Regular
+  #bold:
+    #family: "Consolas"
+    #style: Bold
+  #italic:
+    #family: "Consolas"
+    #style: Italic
+  #bold_italic:
+    #family: "Consolas"
+    #style: Bold Italic
+
+# FiraCode Nerd Font
 font:
   normal:
-    family: "Consolas"
+    family: FiraCode Nerd Font
     style: Regular
   bold:
-    family: "Consolas"
+    family: FiraCode Nerd Font
     style: Bold
   italic:
-    family: "Consolas"
+    family: FiraCode Nerd Font
     style: Italic
   bold_italic:
-    family: "Consolas"
+    family: FiraCode Nerd Font
     style: Bold Italic
 
   # Point size
-  size: 7
+  size: 11
 
   offset:
     x: 0
