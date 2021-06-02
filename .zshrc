@@ -1,9 +1,9 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+#if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  #source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+#fi
 
 #####################
 # FIRST PROMPT LINE #
@@ -31,7 +31,7 @@ autoload -Uz _zinit
 #####################
 # THEME             #
 #####################
-zinit ice depth=1; zinit light romkatv/powerlevel10k
+#zinit ice depth=1; zinit light romkatv/powerlevel10k
 
 #####################
 # PLUGINS           #
@@ -67,10 +67,10 @@ zstyle ':fzf-tab:complete:_zlua:*' query-string input
 zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
 zstyle ':fzf-tab:complete:kill:argument-rest' extra-opts --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
 zstyle ':fzf-tab:complete:cd:*' extra-opts --preview=$extract'exa -1 --color=always ${~ctxt[hpre]}$in'
-# FZF
+## FZF
 zinit ice lucid wait'0b' from"gh-r" as"program"
 zinit light junegunn/fzf
-# FZF BYNARY AND TMUX HELPER SCRIPT
+## FZF BYNARY AND TMUX HELPER SCRIPT
 zinit ice lucid wait'0c' as"command" pick"bin/fzf-tmux"
 zinit light junegunn/fzf
 # BIND MULTIPLE WIDGETS USING FZF
@@ -188,14 +188,15 @@ alias vim=nvim
 alias vi=nvim
 alias myconfig='/usr/bin/git --git-dir=$HOME/.myconfig/ --work-tree=$HOME'
 alias -- -='cd -'
-#alias python=python3
 alias cht="cht.sh"
 
-alias syu='sudo apt update && sudo apt upgrade'
 alias srconfig='source ~/.zshrc'
 alias vpn='cd $HOME/MEGA/brytlyt/openvpn && sudo openvpn --config mgajewskik.brytlyt.com.ovpn --auth-user-pass'
 alias s76=system76-power
 alias om=optimus-manager
+alias weather='curl wttr.in'
+alias clp="greenclip print | sed '/^$/d' | fzf -e | xargs -r -d'\n' -I '{}' greenclip print '{}'"
+alias yay_clean="yay -Rsn $(yay -Qdtq)"
 
 alias ta='tmux attach -t'
 alias tad='tmux attach -d -t'
@@ -258,17 +259,17 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # CONDA SETTINGS       #
 #####################
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/mgajewskik/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/mgajewskik/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/mgajewskik/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/mgajewskik/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
+#__conda_setup="$('/home/mgajewskik/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+#if [ $? -eq 0 ]; then
+    #eval "$__conda_setup"
+#else
+    #if [ -f "/home/mgajewskik/anaconda3/etc/profile.d/conda.sh" ]; then
+        #. "/home/mgajewskik/anaconda3/etc/profile.d/conda.sh"
+    #else
+        #export PATH="/home/mgajewskik/anaconda3/bin:$PATH"
+    #fi
+#fi
+#unset __conda_setup
 
 #####################
 # GO SETTINGS       #
@@ -296,4 +297,6 @@ export PATH="$HOME/.poetry/bin:$PATH"
 #####################
 # P10K SETTINGS     #
 #####################
-[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+#[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+eval "$(starship init zsh)"

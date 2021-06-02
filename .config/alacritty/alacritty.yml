@@ -1,6 +1,20 @@
 env:
   TERM: xterm-256color
 
+window:
+  title: Alacritty
+  class:
+    instance: Alacritty
+    general: Alacritty
+  padding:
+    x: 4
+    y: 4
+  dimensions:
+    columns: 100
+    lines: 50
+  dynamic_padding: false
+
+
 # shell:
   # program: /bin/zsh
   # args:
@@ -87,36 +101,37 @@ background_opacity: 1
 # FiraCode Nerd Font
 font:
   normal:
-    family: FiraCode Nerd Font
-    style: Regular
+    family: Fira Code Nerd Font
+    #family: Fura Code Nerd Font
+    #family: Sauce Code Pro Nerd Font
+    style: Retina
   bold:
-    family: FiraCode Nerd Font
+    family: Fira Code Nerd Font
     style: Bold
   italic:
-    family: FiraCode Nerd Font
+    family: Fira Code Nerd Font
     style: Italic
   bold_italic:
-    family: FiraCode Nerd Font
+    family: Fira Code Nerd Font
     style: Bold Italic
 
   # Point size
-  size: 11
+  size: 10
 
+  # Offset is the extra space around each character. `offset.y` can be thought of
+  # as modifying the line spacing, and `offset.x` as modifying the letter spacing.
   offset:
     x: 0
-    y: 0
+    y: 1
+
+
+  # Glyph offset determines the locations of the glyphs within their cells with
+  # the default being at the bottom. Increasing `x` moves the glyph to the right,
+  # increasing `y` moves the glyph upwards.
   glyph_offset:
     x: 0
     y: 0
 
-window:
-  padding:
-    x: 4
-    y: 1
-  dimensions:
-    columns: 100
-    lines: 50
-  # dynamic_padding: false
 
 scrolling:
   # Maximum number of lines in the scrollback buffer.

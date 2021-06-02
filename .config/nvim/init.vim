@@ -63,6 +63,8 @@ endif
 
 " disable polyglot for certain filetypes
 "let g:polyglot_disabled = ['csv', 'go']
+"
+autocmd FileType * lua require'colorizer'.setup()
 
 " List of plugins to install with Plug
 call plug#begin('~/.vim/plugged')
@@ -72,7 +74,8 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'norcalli/snippets.nvim'
 Plug 'preservim/nerdcommenter'
 Plug 'lifepillar/vim-gruvbox8'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+"Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug '/usr/bin/fzf'
 Plug 'junegunn/fzf.vim'
 "Plug 'ojroques/nvim-lspfuzzy'
 Plug 'stsewd/fzf-checkout.vim'
@@ -94,6 +97,7 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'p00f/nvim-ts-rainbow'
 Plug 'kosayoda/nvim-lightbulb'
+Plug 'norcalli/nvim-colorizer.lua'
 
 call plug#end()
 
@@ -357,8 +361,8 @@ let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 " fzf settings
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8, 'highlight': 'Comment' } }
 "let $FZF_DEFAULT_OPTS="--ansi --preview-window 'right:60%' --layout reverse --preview 'bat --color=always --style=header,grid --line-range :300 {}' --bind ctrl-s:select-all"
-"let FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi"'
-"let $FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git/*,.tox/*,venv/*,.pyi,.pyc}" 2> /dev/null'
+"let FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi" --glob "!.venv/*"'
+"let $FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git/*,.tox/*,venv/*,.pyi,.pyc,.venv/*}" 2> /dev/null'
 " let g:fzf_preview_window = ['up:60%']
 " CTRL-A CTRL-Q to select all and build quickfix list
 
@@ -557,8 +561,8 @@ nnoremap <Leader>b :Buffer<CR>
 nnoremap <Leader>` :Buffer<CR>
 nnoremap <Leader>sc :Commits<CR>
 nnoremap <Leader>rf :Files ~/<CR>
-nnoremap <leader>pf :ProjectFiles<CR>
-nnoremap <leader>f :GFiles<CR>
+nnoremap <leader>f :ProjectFiles<CR>
+"nnoremap <leader>f :GFiles<CR>
 nnoremap <leader>sb :GBranches<CR>
 nnoremap <leader>st :GTags<CR>
 " Completion and snippets
@@ -642,7 +646,7 @@ command! Jfmt :%!jq .
 " --color: Search color options
 command! -bang -nargs=* Find
     \ call fzf#vim#grep(
-    \   'rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi" --color "always" '.shellescape(<q-args>).'| tr -d "\017"',
+    \   'rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi" --glob "~/.data/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"',
     \   1, fzf#vim#with_preview(), <bang>0)
 
 " exploratory search function
@@ -771,6 +775,8 @@ autocmd BufEnter * CompletionToggle
 autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()
 "vim.api.nvim_command[[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()]]
 "autocmd BufWritePre *.py lua vim.lsp.buf.formatting_sync()
+autocmd FileType * ColorizerAttachToBuffer
+au BufRead,BufNewFile *.md setlocal textwidth=80
 
 " =========================================================================
 " Additional functionality to note
