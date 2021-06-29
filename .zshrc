@@ -191,7 +191,7 @@ alias -- -='cd -'
 alias cht="cht.sh"
 
 alias srconfig='source ~/.zshrc'
-alias vpn='cd $HOME/MEGA/brytlyt/openvpn && sudo openvpn --config mgajewskik.brytlyt.com.ovpn --auth-user-pass'
+alias senv='source venv/bin/activate'
 alias s76=system76-power
 alias om=optimus-manager
 alias weather='curl wttr.in'
@@ -204,6 +204,10 @@ alias ts='tmux new-session -s'
 alias tl='tmux list-sessions'
 alias tksv='tmux kill-server'
 alias tkss='tmux kill-session -t'
+
+alias vpn='cd $HOME/MEGA/brytlyt/openvpn && sudo openvpn --config mgajewskik.brytlyt.com.ovpn --auth-user-pass'
+alias localaws='docker run -d -e "SERVICES=s3,dynamodb" -p 4566-4599:4566-4599 localstack/localstack:0.12.6'
+alias completeaws="complete -C '/usr/bin/aws_completer' aws"
 
 #alias poetry=$HOME/.poetry/bin/poetry
 
@@ -286,8 +290,9 @@ export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 
 if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
+  eval "$(pyenv init --path)"
 fi
+#eval "$(pyenv init --path)"
 
 ############################
 ## POETRY SETTINGS         #
@@ -300,3 +305,10 @@ export PATH="$HOME/.poetry/bin:$PATH"
 #[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
 eval "$(starship init zsh)"
+
+# Necessary for AWS autocompletion
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit && compinit
+compinit
+
+eval "$(complete -C '/usr/bin/aws_completer' aws)"

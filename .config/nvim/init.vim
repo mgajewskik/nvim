@@ -39,8 +39,10 @@ set grepprg=rg\ --vimgrep
 set shortmess+=c " dont pass messages to ins-completion-menu
 " set signcolumn=yes " always show signcolumns
 " set 7 lines from beginning and end of file
-set so=7
+set so=15
 set undolevels=700 " undo levels
+
+set foldmethod=marker
 
 set termguicolors
 set showtabline=2
@@ -98,6 +100,10 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'p00f/nvim-ts-rainbow'
 Plug 'kosayoda/nvim-lightbulb'
 Plug 'norcalli/nvim-colorizer.lua'
+Plug 'hashivim/vim-terraform'
+Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh' }
+Plug 'ptzz/lf.vim'
+Plug 'voldikss/vim-floaterm'
 
 call plug#end()
 
@@ -187,6 +193,13 @@ let g:diagnostic_enable_virtual_text = 1
         staticcheck = true,
       },
     },
+    on_attach = on_attach,
+  }
+
+  nvim_lsp.terraformls.setup {
+    cmd = { "terraform-ls", "serve" };
+    filetypes = { "terraform", "tf", "tfvars" };
+    root_dir = nvim_lsp.util.root_pattern('go.mod', '.git');
     on_attach = on_attach,
   }
 EOF
@@ -432,6 +445,29 @@ let g:crystalline_statusline_fn = 'StatusLine'
 let g:crystalline_tabline_fn = 'TabLine'
 let g:crystalline_theme = 'gruvbox'
 
+let g:terraform_align=1
+let g:terraform_fold_sections=0
+let g:terraform_fmt_on_save=1
+
+" We're going to define single-letter keymaps, so don't try to define them
+" in the terminal window.  The debugger CLI should continue accepting text commands.
+function! NvimGdbNoTKeymaps()
+  tnoremap <silent> <buffer> <esc> <c-\><c-n>
+endfunction
+
+let g:nvimgdb_disable_start_keymaps = 1
+let g:nvimgdb_config_override = {
+  \ 'key_next': 'n',
+  \ 'key_step': 's',
+  \ 'key_finish': 'f',
+  \ 'key_continue': 'c',
+  \ 'key_until': 'u',
+  \ 'key_breakpoint': 'b',
+  \ 'set_tkeymaps': "NvimGdbNoTKeymaps",
+  \ }
+
+let g:lf_map_keys = 0
+
 " ===========================================================================
 " Key mappings
 " ===========================================================================
@@ -441,14 +477,16 @@ let g:crystalline_theme = 'gruvbox'
 map <Space> <leader>
 " terminal settings
 " esc to exit terminal
-tnoremap jj <C-\><C-n>
+tnoremap <C-w>e <C-\><C-n>
 " 0 goes to first non-blank character
 nnoremap 0 ^
 nnoremap ^ 0
 nmap <leader><CR> O<Esc>
 nmap <CR> o<Esc>
 " remap ESC key in insert mode only
-:imap jj <esc>
+:inoremap jj <esc>
+:inoremap jk <esc>
+:inoremap kj <esc>
 " move vertically by visual line
 nnoremap j gj
 nnoremap k gk
@@ -493,8 +531,8 @@ nnoremap <leader>8 8gt
 nnoremap <leader>9 9gt
 nnoremap <leader>0 :tablast<cr>
 " resize panes
-nnoremap <Leader>= :vertical resize +5<CR>
-nnoremap <Leader>- :vertical resize -5<CR>
+nnoremap <Leader>= :vertical resize +12<CR>
+nnoremap <Leader>- :vertical resize -12<CR>
 " select in visual mode and move whole block with J and K
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
@@ -550,17 +588,22 @@ nmap <leader>cc :NERDCommenterComment<CR>
 nmap <leader>c<space> :NERDCommenterToggle<CR>
 " Trees shortcut
 nnoremap <leader>u :UndotreeShow<CR>
-nnoremap <leader>e :NvimTreeToggle<CR>
+nnoremap <leader>w :NvimTreeToggle<CR>
+nnoremap <leader>e :Lf<CR>
+nnoremap <leader>E :LfWorkingDirectory<CR>
 " fzf shortcuts
 nnoremap cc :Commands<CR>
 nnoremap // :BLines<CR>
 "nnoremap <Leader>s :Find<SPACE>
 nnoremap <leader>ws :Find <C-R>=expand("<cword>")<CR><CR>
 nnoremap <leader><leader> :RG<CR>
+nnoremap <leader>wf :RGsduword<CR>
+nnoremap <leader>sw :RGsdu<CR>
 nnoremap <Leader>b :Buffer<CR>
 nnoremap <Leader>` :Buffer<CR>
 nnoremap <Leader>sc :Commits<CR>
 nnoremap <Leader>rf :Files ~/<CR>
+nnoremap <Leader>sf :Files ~/sdu/<CR>
 nnoremap <leader>f :ProjectFiles<CR>
 "nnoremap <leader>f :GFiles<CR>
 nnoremap <leader>sb :GBranches<CR>
@@ -617,12 +660,19 @@ nmap <leader>gs :G<CR>
 nmap <leader>gv :Gvdiffsplit!<CR>
 nmap <leader>gc :Git commit<CR>
 nmap <leader>gl :G log<CR>
+"nmap <leader>gr :Git rebase -i HEAD~5<CR>
+nmap <leader>gb :Git blame<CR>
+nmap <leader>sr :Git rebase -i HEAD~5<CR>
 
 " Sneak mappings
 map f <Plug>Sneak_f
 map F <Plug>Sneak_F
 map t <Plug>Sneak_t
 map T <Plug>Sneak_T
+
+nnoremap <leader>ad :let @a=expand('%')<CR>:GdbStartPDB python -m pdb <c-r>a
+"cnoremap <a-q> <c-c>:let @a=expand('%')<CR>:<Up><c-r>a
+
 
 " ============================================================================
 " Scripts and defined commands
@@ -644,21 +694,24 @@ command! Jfmt :%!jq .
 " --follow: Follow symlinks
 " --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
 " --color: Search color options
+    "\   'rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi" --color "always" '.shellescape(<q-args>).'| tr -d "\017"',
 command! -bang -nargs=* Find
     \ call fzf#vim#grep(
-    \   'rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --glob "!.tox/*" --glob "!venv/*" --glob "!.pyc" --glob "!.pyi" --glob "~/.data/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"',
+    \   'rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --color "always" '.shellescape(<q-args>).'| tr -d "\017"',
     \   1, fzf#vim#with_preview(), <bang>0)
 
 " exploratory search function
-function! RipgrepFzf(query, fullscreen)
+function! RipgrepFzf(path, query, fullscreen)
   let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case -- %s || true'
   let initial_command = printf(command_fmt, shellescape(a:query))
   let reload_command = printf(command_fmt, '{q}')
-  let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+  let spec = {'dir': a:path, 'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
   call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
 endfunction
 
-command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+command! -nargs=* -bang RG call RipgrepFzf(system('git rev-parse --show-toplevel 2> /dev/null')[:-2], <q-args>, <bang>0)
+command! -nargs=* -bang RGsdu call RipgrepFzf('~/sdu', <q-args>, <bang>0)
+command! -nargs=* -bang RGsduword call RipgrepFzf('~/sdu', expand("<cword>"), <bang>0)
 
 " Function to search for files from root project directory
 function! s:find_git_root()
@@ -777,6 +830,9 @@ autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()
 "autocmd BufWritePre *.py lua vim.lsp.buf.formatting_sync()
 autocmd FileType * ColorizerAttachToBuffer
 au BufRead,BufNewFile *.md setlocal textwidth=80
+
+autocmd BufWinEnter *.py nmap <silent> <F2> :w<CR>:terminal python3 -m pdb '%:p'<CR>
+
 
 " =========================================================================
 " Additional functionality to note

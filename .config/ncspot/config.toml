@@ -1,0 +1,8 @@
+use_nerdfont = true
+notify = true
+
+[keybindings]
+"Ctrl+d" = "move down 5"
+"Ctrl+u" = "move up 5"
+"Ctrl+o" = "back"
+"Ctrl+i" = "open selected"

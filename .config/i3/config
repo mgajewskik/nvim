@@ -6,22 +6,27 @@ smart_borders on
 set $mod Mod4
 set $alt Mod1
 set $term --no-startup-id alacritty
-set $wallpaper_reset --no-startup-id feh --bg-fill --no-fehbg ~/arch_nebula.jpg && notify-send 'wallpaper reset'
+set $wallpaper_reset feh --bg-fill --no-fehbg ~/Pictures/Wallpapers/firewatch_6.jpg && notify-send 'wallpaper reset'
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
 # #---Gaps---# #
 for_window [class="^.*"] border pixel 2
-gaps inner 3
-gaps outer 3
+gaps inner 0
+gaps outer 0
 
 # #---Autostart---# #
 #exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 #exec --no-startup-id conky -c $HOME/.config/conky/xmonad.conkyrc
 #exec --no-startup-id greenclip daemon
 exec --no-startup-id dunst
-#exec --no-startup-id picom -b
+exec --no-startup-id udiskie --tray
+exec_always --no-startup-id systemctl --user start greenclip.service
+exec_always --no-startup-id systemctl --user start blugon.service
+#exec --no-startup-id blugon --readcurrent --interval=3600 --configdir=~/.config/blugon
+exec_always --no-startup-id picom --config ~/.config/picom.conf
+exec_always --no-startup-id "sudo /home/mgajewskik/bin/set-thermals.sh && notify-send 'Thermals set'"
 #exec --no-startup-id xset m 300 0
 #exec_always --no-startup-id autotiling
 
@@ -30,7 +35,7 @@ exec --no-startup-id xinput set-prop "Synaptics TM3418-002" "libinput Accel Spee
 exec --no-startup-id /usr/bin/setxkbmap -option "ctrl:nocaps"
 #exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 #exec --no-startup-id nitrogen --restore; sleep 1; picom -b
-exec_always $wallpaper_reset
+exec_always --no-startup-id $wallpaper_reset
 exec --no-startup-id nm-applet
 #exec --no-startup-id xfce4-power-manager
 #exec --no-startup-id pamac-tray
@@ -43,7 +48,7 @@ exec --no-startup-id blueman-applet
 #exec_always --no-startup-id ff-theme-util
 #exec_always --no-startup-id fix_xcursor
 exec --no-startup-id megasync
-exec --no-startup-id gpclient
+#exec --no-startup-id gpclient
 
 #exec --no-startup-id volumeicon
 #exec --no-startup-id pulseaudio
@@ -83,11 +88,14 @@ bindsym $mod+Shift+r restart
 bindsym $mod+q			            [con_id="__focused__" instance="^(?!dropdown_).*$"] kill
 bindsym $mod+Shift+q		        [con_id="__focused__" instance="^(?!dropdown_).*$"] exec --no-startup-id kill -9 `xdotool getwindowfocus getwindowpid`
 
+#bindsym $mod+[                      exec --no-startup-id blugon --setcurrent="-600"
+#bindsym $mod+]                      exec --no-startup-id blugon --setcurrent="+600"
 
 #bindsym $mod+c 			            exec --no-startup-id $term -e calcurse
 bindsym $mod+w                      exec --no-startup-id pavucontrol
 #bindsym $mod+w 			        exec --no-startup-id brave
-bindsym $mod+e 			            exec --no-startup-id nautilus
+#bindsym $mod+e 			            exec --no-startup-id nautilus
+bindsym $mod+e 			            exec --no-startup-id alacritty -e lf
 #bindsym $mod+y 			        exec --no-startup-id clipit
 #bindsym $mod+Shift+e		        exec $term -e code-insiders
 bindsym $mod+p 			            exec --no-startup-id bitwarden-desktop
@@ -96,7 +104,7 @@ bindsym $mod+p 			            exec --no-startup-id bitwarden-desktop
 #bindsym $mod+o			            exec --no-startup-id $term -e nvim ~/Repos/blog/content
 # bindsym $mod+Shift			    exec --no-startup-id $term -e nvim ~/Repos
 bindsym $mod+f			            fullscreen toggle
-bindsym $mod+Ctrl+f 	          floating toggle
+bindsym $mod+Shift+f 	          floating toggle
 
 
 # h
@@ -143,10 +151,9 @@ bindsym $mod+i split h
 # split in vertical orientation
 bindsym $mod+o split v
 
-
 # change container layout (stacked, tabbed, toggle split)
 #bindsym $mod+s layout stacking
-#bindsym $mod+w layout tabbed
+bindsym $mod+a layout tabbed
 bindsym $mod+s layout toggle split
 
 # toggle tiling / floating
@@ -185,14 +192,14 @@ set $ws0 "0"
 #for_window [title=".*Emulator.*"] floating enable
 
 ## Nvidia
-#workspace "0" output eDP-1-1
-#workspace "1" output DP-1
-#workspace "2" output DP-1
-#workspace "3" output DP-1
-#workspace "4" output DP-1
-#workspace "5" output DP-1
+#workspace "0" output eDP-1-1 eDP-1
+#workspace "1" output DP-1 DP-1-1 DP-1-2
+#workspace "2" output DP-1 DP-1-1 DP-1-2
+#workspace "3" output DP-1 DP-1-1 DP-1-2
+#workspace "4" output DP-1 DP-1-1 DP-1-2
+#workspace "5" output DP-1 DP-1-1 DP-1-2
 
-# Integrated
+## Integrated
 workspace "0" output eDP-1
 workspace "1" output DP-1-2
 workspace "2" output DP-1-2
@@ -245,7 +252,7 @@ bindsym $mod+Shift+6 move container to workspace number $ws6
 bindsym $mod+Shift+7 move container to workspace number $ws7
 bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
-bindsym $mod+Shift+0 move container to workspace number $ws10
+bindsym $mod+Shift+0 move container to workspace number $ws0
 
 # Open specific applications in floating mode
 for_window [title="alsamixer"] floating enable border pixel 1
@@ -303,6 +310,18 @@ mode "resize" {
         bindsym $mod+r mode "default"
 }
 
+bindsym $mod+b mode "$mode_blue"
+set $mode_blue (d)own, (u)p, (r)estart
+mode "$mode_blue" {
+    bindsym u exec --no-startup-id blugon --setcurrent="+600", mode "default"
+    bindsym d exec --no-startup-id blugon --setcurrent="-600", mode "default"
+    bindsym r exec --no-startup-id systemctl --user restart blugon.service, mode "default"
+
+    # exit system mode: "Enter" or "Escape"
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
 # Set shut down, restart and locking features
 bindsym $mod+Escape mode "$mode_system"
 set $mode_system (l)ock, (e)xit, switch_(u)ser, (s)uspend, (h)ibernate, (r)eboot, (Shift+s)hutdown
@@ -325,12 +344,13 @@ bindsym $mod+m mode "$mode_display"
 set $mode_display Choose monitor connection: (s)ingle, (i)ntegrated, (h)ybrid-dell, (n)vidia-dell, (p)rojector, (w)allpaper
 mode "$mode_display" {
     #bindsym s exec --no-startup-id xrandr --auto --output eDP-1-1 --primary && notify-send 'Single monitor configured', mode "default"
-    bindsym s exec --no-startup-id xrandr --auto --output eDP-1 --primary && notify-send 'Single monitor configured', mode "default"
-    bindsym i exec --no-startup-id xrandr && xrandr --auto --output DP-1-2 --primary --mode 3440x1440 --above eDP-1 && notify-send 'Dell output for hybrid configured', mode "default"
-    bindsym h exec --no-startup-id xrandr --auto --output DP-1-1 --primary --mode 3440x1440 --above eDP-1 && notify-send 'Dell output for hybrid configured', mode "default"
-    bindsym n exec --no-startup-id xrandr --auto --output DP-1 --primary --mode 3440x1440 --above eDP-1-1 && notify-send 'Dell output for nvidia configured', mode "default"
-    bindsym p exec --no-startup-id xrandr --auto --output HDMI-0 --mode 1920x1080 --same-as eDP-1-1 && notify-send 'HDMI projector configured', mode "default"
-    bindsym w exec $wallpaper_reset
+    bindsym s exec --no-startup-id xrandr --auto --output eDP-1 --primary && notify-send 'Single monitor configured' && $wallpaper_reset, mode "default"
+    bindsym i exec --no-startup-id xrandr && xrandr --auto --output DP-1-2 --primary --mode 3440x1440 --above eDP-1 && notify-send 'Dell output for integrated configured' && $wallpaper_reset, mode "default"
+    bindsym h exec --no-startup-id xrandr --auto --output DP-1-1 --primary --mode 3440x1440 --above eDP-1 && notify-send 'Dell output for hybrid configured' && $wallpaper_reset, mode "default"
+    bindsym n exec --no-startup-id xrandr --auto --output DP-1 --primary --mode 3440x1440 --above eDP-1-1 && notify-send 'Dell output for nvidia configured' && $wallpaper_reset, mode "default"
+    bindsym p exec --no-startup-id xrandr --auto --output HDMI-1-1 --mode 1920x1080 --same-as eDP-1-1 && notify-send 'HDMI projector configured' && $wallpaper_reset, mode "default"
+    #bindsym p exec --no-startup-id xrandr --auto --output DP-0 --mode 1920x1080 --same-as eDP-1-1 && notify-send 'DP projector configured' && $wallpaper_reset, mode "default"
+    bindsym w exec --no-startup-id $wallpaper_reset
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
@@ -360,7 +380,7 @@ bar {
 
 ## please set your primary output first. Example: 'xrandr --output eDP1 --primary'
     tray_output primary
-	#tray_output eDP-1-1
+    tray_output eDP-1-1
     #xrandr --output DP-1 --primary
 
 	bindsym button4 nop
