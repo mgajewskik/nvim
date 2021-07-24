@@ -49,6 +49,11 @@ class Commands(object):
     om_hybrid = "optimus-manager --switch hybrid --no-confirm"
     om_nvidia = "optimus-manager --switch nvidia --no-confirm"
 
+    lock = "slock"
+    reboot = "systemctl reboot"
+    suspend = "systemctl suspend"
+    shutdown = "systemctl poweroff"
+
     autostart = [wallpaper_reset, greenclip, blugon_restart]
 
 keys = [
@@ -152,10 +157,11 @@ keys = [
     ]),
 
     # Locking and exiting
-    KeyChord([MOD], "ESC", [
-        Key([], "i", lazy.spawn(Commands.om_integrated)),
-        Key([], "h", lazy.spawn(Commands.om_hybrid)),
-        Key([], "n", lazy.spawn(Commands.om_nvidia)),
+    KeyChord([MOD], "Escape", [
+        Key([], "l", lazy.spawn(Commands.lock)),
+        Key([], "r", lazy.spawn(Commands.reboot)),
+        Key([], "s", lazy.spawn(Commands.suspend)),
+        Key([], "q", lazy.spawn(Commands.shutdown)),
     ])
 ]
 

@@ -23,7 +23,7 @@ gaps outer 0
 exec --no-startup-id dunst
 exec --no-startup-id udiskie --tray
 exec_always --no-startup-id systemctl --user start greenclip.service
-exec_always --no-startup-id systemctl --user start blugon.service
+#exec_always --no-startup-id systemctl --user start blugon.service
 #exec --no-startup-id blugon --readcurrent --interval=3600 --configdir=~/.config/blugon
 exec_always --no-startup-id picom --config ~/.config/picom.conf
 exec_always --no-startup-id "sudo /home/mgajewskik/bin/set-thermals.sh && notify-send 'Thermals set'"
@@ -69,7 +69,7 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 
 # #---Bindings---# #
 bindsym $mod+Return 		         exec $term
-bindsym $mod+Shift+Return	         exec --no-startup-id prime-run alacritty
+bindsym $mod+Shift+Return	         exec --no-startup-id alacritty
 
 bindsym $mod+Tab 			         exec --no-startup-id rofi -show combi
 #bindsym $mod+Tab 			         exec --no-startup-id rofi -show run
@@ -90,6 +90,9 @@ bindsym $mod+Shift+q		        [con_id="__focused__" instance="^(?!dropdown_).*$"
 
 #bindsym $mod+[                      exec --no-startup-id blugon --setcurrent="-600"
 #bindsym $mod+]                      exec --no-startup-id blugon --setcurrent="+600"
+#
+#bindsym $mod+n                      exec --no-startup-id dunstctl set-paused toggle
+bindsym $mod+n                      exec --no-startup-id $term -e joplin
 
 #bindsym $mod+c 			            exec --no-startup-id $term -e calcurse
 bindsym $mod+w                      exec --no-startup-id pavucontrol

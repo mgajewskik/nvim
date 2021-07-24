@@ -199,7 +199,14 @@ let g:diagnostic_enable_virtual_text = 1
   nvim_lsp.terraformls.setup {
     cmd = { "terraform-ls", "serve" };
     filetypes = { "terraform", "tf", "tfvars" };
-    root_dir = nvim_lsp.util.root_pattern('go.mod', '.git');
+    root_dir = nvim_lsp.util.root_pattern('.git');
+    on_attach = on_attach,
+  }
+
+  nvim_lsp.groovyls.setup {
+    cmd = { "java", "-jar", "/home/mgajewskik/repos/cloned/groovy-language-server/build/libs/groovy-language-server-all.jar" };
+    filetypes = { "groovy" };
+    root_dir = nvim_lsp.util.root_pattern('.git');
     on_attach = on_attach,
   }
 EOF
