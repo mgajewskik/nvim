@@ -16,3 +16,4 @@ nm-applet &
 blueman-applet &
 dunst &
 megasync &
+pcloud &

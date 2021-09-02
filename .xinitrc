@@ -10,7 +10,8 @@ sysresources=/etc/X11/xinit/.Xresources
 sysmodmap=/etc/X11/xinit/.Xmodmap
 
 #SESSION=${1:-xfce-session}
-DEFAULT_SESSION='i3 --shmlog-size 0'
+#DEFAULT_SESSION='i3 --shmlog-size 0'
+DEFAULT_SESSION='qtile'
 
 # merge in defaults and keymaps
 
@@ -58,6 +59,7 @@ get_session(){
 		mate) dbus_args+=(mate-session) ;;
 		xfce) dbus_args+=(xfce4-session) ;;
 		openbox) dbus_args+=(openbox-session) ;;
+		qtile) dbus_args+=(qtile start) ;;
 		*) dbus_args+=("$1") ;;
 	esac
 

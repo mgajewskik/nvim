@@ -164,7 +164,7 @@ export PATH=$PATH:/usr/local/bin
 export PATH=$PATH:/usr/local/sbin
 export PATH=$PATH:$HOME/.local/bin
 export PATH=$PATH:$HOME/.cargo/bin
-export PATH=$PATH:$HOME/bin
+export PATH=$PATH:$HOME/scripts
 #path+=('/usr/local/bin')
 #path+=('$HOME/.local/bin')
 #path+=('$HOME/.cargo/bin')
@@ -197,6 +197,7 @@ alias om=optimus-manager
 alias weather='curl wttr.in'
 alias clp="greenclip print | sed '/^$/d' | fzf -e | xargs -r -d'\n' -I '{}' greenclip print '{}'"
 alias yay_clean="yay -Rsn $(yay -Qdtq)"
+alias godoro='pomodoro $1 && dunstify "Pomodoro finish time!!!" -u critical -t 9999999'
 
 alias ta='tmux attach -t'
 alias tad='tmux attach -d -t'
@@ -291,8 +292,10 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init --path)"
+  eval "$(pyenv init -)"
 fi
 #eval "$(pyenv init --path)"
+#eval "$(pyenv init -)"
 
 ############################
 ## POETRY SETTINGS         #

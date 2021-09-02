@@ -18,8 +18,10 @@ class Commands(object):
     notify_toggle = "dunstctl set-paused toggle"
     terminal = 'alacritty'
     lock = 'xscreensaver-command -lock'
-    files = 'alacritty -e lf'
-    notes = 'alacritty -e joplin'
+    # files = 'alacritty -e lf'
+    files = 'nautilus'
+    # notes = 'alacritty -e joplin'
+    notes = 'joplin-desktop'
     audio = 'pavucontrol'
     passwords = 'bitwarden-desktop'
     clipboard = "rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'"
@@ -38,11 +40,12 @@ class Commands(object):
     blugon_restart = "systemctl --user restart blugon.service"
 
     xrandr = "xrandr"
+    sleep = "sleep 5"
     monitor_single = "xrandr --auto --output eDP-1 --primary"
     dell_integrated = "xrandr --auto --output DP-1-2 --primary --mode 3440x1440 --above eDP-1"
     dell_hybrid = "xrandr --auto --output DP-1-1 --primary --mode 3440x1440 --above eDP-1"
     dell_nvidia = "xrandr --auto --output DP-1 --primary --mode 3440x1440 --above eDP-1-1"
-    projector = "xrandr --auto --output HDMI-1-1 --mode 1920x1080 --same-as eDP-1-1"
+    projector = "xrandr --auto --output DP-1 --mode 1920x1080 --same-as eDP-1-1"
     wallpaper_reset = "feh --bg-fill --no-fehbg ~/Pictures/Wallpapers/firewatch_6.jpg"
 
     om_integrated = "optimus-manager --switch integrated --no-confirm"
@@ -127,20 +130,26 @@ keys = [
         Key([], "i",
             lazy.spawn(Commands.xrandr),
             lazy.spawn(Commands.dell_integrated),
+            lazy.spawn(Commands.sleep),
+            lazy.spawn(Commands.wallpaper_reset),
             lazy.spawn(Commands.notify.format("Dell monitor configured for integrated mode")),
             lazy.restart()
         ),
         Key([], "h",
             lazy.spawn(Commands.dell_hybrid),
+            lazy.spawn(Commands.sleep),
+            lazy.spawn(Commands.wallpaper_reset),
             lazy.spawn(Commands.notify.format("Dell monitor configured for hybrid mode")),
         ),
         Key([], "n",
             lazy.spawn(Commands.dell_nvidia),
+            lazy.spawn(Commands.sleep),
+            lazy.spawn(Commands.wallpaper_reset),
             lazy.spawn(Commands.notify.format("Dell monitor configured for nvidia mode")),
         ),
         Key([], "p",
             lazy.spawn(Commands.projector),
-            lazy.spawn(Commands.notify.format("Projector configured for HDMI")),
+            lazy.spawn(Commands.notify.format("Projector configured for USB-C")),
         ),
         Key([], "w",
             lazy.spawn(Commands.wallpaper_reset),
@@ -151,9 +160,19 @@ keys = [
 
     # Optimus Manager graphics card switching
     KeyChord([MOD], "g", [
-        Key([], "i", lazy.spawn(Commands.om_integrated)),
-        Key([], "h", lazy.spawn(Commands.om_hybrid)),
-        Key([], "n", lazy.spawn(Commands.om_nvidia)),
+        Key([], "i",
+            lazy.spawn(Commands.notify.format("Switching grapics to integrated mode...")),
+            lazy.spawn(Commands.om_integrated),
+        ),
+        Key([], "h",
+            lazy.spawn(Commands.notify.format("Switching graphics to hybrid mode...")),
+            lazy.spawn(Commands.om_hybrid),
+
+        ),
+        Key([], "n",
+            lazy.spawn(Commands.notify.format("Switching graphics to nvidia mode...")),
+            lazy.spawn(Commands.om_nvidia)
+        ),
     ]),
 
     # Locking and exiting
@@ -300,7 +319,12 @@ def init_widgets_list():
         widget.Sep(**Theme.sep),
 
         widget.TextBox(text = " 🌡 " ,**Theme.text),
-        widget.ThermalSensor(threshold=80, update_interval=1, **Theme.widget),
+        widget.TextBox(text = "C: " ,**Theme.text),
+        widget.ThermalSensor(threshold=70, update_interval=1, **Theme.widget),
+        # widget.Sep(**Theme.sep),
+
+        widget.TextBox(text = " N: " ,**Theme.text),
+        widget.NvidiaSensors(threshold=70, update_interval=1, **Theme.widget),
         widget.Sep(**Theme.sep),
 
         # widget.Net(
@@ -376,7 +400,10 @@ floating_layout = layout.floating.Floating(
         'Pavucontrol',
         'GParted',
         'alsamixer',
-        'galculator'
+        'galculator',
+        'MEGA',
+        'gpclient',
+        'pcloud'
     )],
     auto_float_types=[
         'notification',
