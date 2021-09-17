@@ -191,7 +191,7 @@ alias -- -='cd -'
 alias cht="cht.sh"
 
 alias srconfig='source ~/.zshrc'
-alias senv='source venv/bin/activate'
+alias senv='which pip; source venv/bin/activate; which pip'
 alias s76=system76-power
 alias om=optimus-manager
 alias weather='curl wttr.in'
