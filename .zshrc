@@ -215,9 +215,46 @@ alias completeaws="complete -C '/usr/bin/aws_completer' aws"
 #####################
 # DOCKER FUNC      #
 #####################
+alias drc='docker-compose'
+alias dre='docker exec -it'
+
 docker-ip () { docker inspect "$@" | grep "IPAddress\": \"1" | grep -o "[0-9\.]*"| uniq | head -1; }
 logs () { docker logs -f --tail 100  "$@" ; }
 b () { docker exec -e COLUMNS="`tput cols`" -e LINES="`tput lines`"  -it "$@" bash; }
+
+# remove images matching pattern
+drirm () {
+  docker image rm $(docker image ls -f "reference=$1*" -q) --force
+}
+
+# remove containers matching pattern
+drcrm () {
+  docker container rm $(docker ps -aqf "name=$1*" -q) --force
+}
+
+# remove volumes matching pattern
+drvrm () {
+  docker volume rm $(docker volume ls -f "name=$1*" -q) --force
+}
+
+# nuke images, containers and volumes matching pattern
+drnuke () {
+  drirm $1;
+  drcrm $1;
+  drvrm $1;
+}
+
+# remove volumes matching pattern
+drvrm () {
+  volumes=$(docker volume ls -f "name=$1*" -q)
+  count=$(echo $volumes | sed '/^\s*$/d' | wc -l | xargs)
+  if [ "$count" -gt 0 ]; then
+    echo "Removing $count volumes matching pattern: '$1'"
+    docker volume rm $volumes --force
+  else
+    echo "No volumes matching pattern: '$1'. Aborting."
+  fi
+}
 
 #####################
 # FANCY-CTRL-Z      #
