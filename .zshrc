@@ -221,6 +221,7 @@ alias dre='docker exec -it'
 docker-ip () { docker inspect "$@" | grep "IPAddress\": \"1" | grep -o "[0-9\.]*"| uniq | head -1; }
 logs () { docker logs -f --tail 100  "$@" ; }
 b () { docker exec -e COLUMNS="`tput cols`" -e LINES="`tput lines`"  -it "$@" bash; }
+drsh () { docker exec -e COLUMNS="`tput cols`" -e LINES="`tput lines`"  -it "$@" bash; }
 
 # remove images matching pattern
 drirm () {

@@ -10,8 +10,8 @@ sysresources=/etc/X11/xinit/.Xresources
 sysmodmap=/etc/X11/xinit/.Xmodmap
 
 #SESSION=${1:-xfce-session}
-#DEFAULT_SESSION='i3 --shmlog-size 0'
-DEFAULT_SESSION='qtile'
+DEFAULT_SESSION='i3 --shmlog-size 0'
+#DEFAULT_SESSION='qtile'
 
 # merge in defaults and keymaps
 
@@ -65,5 +65,7 @@ get_session(){
 
 	echo "dbus-launch ${dbus_args[*]}"
 }
+
+#exec xtrace qtile >> ~/qtile.log
 
 exec $(get_session "$1")

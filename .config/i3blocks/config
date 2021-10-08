@@ -25,7 +25,7 @@
 # The top properties below are applied to every block, but can be overridden.
 # Each block command defaults to the script name to avoid boilerplate.
 command=/usr/lib/i3blocks/$BLOCK_NAME
-separator_block_width=25
+separator_block_width=20
 markup=none
 
 
@@ -44,9 +44,9 @@ interval=900
 # Network Speed
 #
 # Displays the current network speed
-[network_speed]
-interval=900
-command=~/.config/i3blocks/i3speedtest
+#[network_speed]
+#interval=900
+#command=~/.config/i3blocks/i3speedtest
 
 ## Wifi connectivity level
 #[wifi]
@@ -63,39 +63,39 @@ command=~/.config/i3blocks/i3speedtest
 # Memory usage
 #
 # The type defaults to "mem" if the instance is not specified.
-[memory]
-separator=false
-interval=1
-command=echo "MEM: $(~/.config/i3blocks/i3memory)"
+#[memory]
+#separator=false
+#interval=1
+#command=echo "MEM: $(~/.config/i3blocks/i3memory)"
 
 # Disk usage
 #
 # The directory defaults to $HOME if the instance is not specified.
 # The script may be called with a optional argument to set the alert
 # (defaults to 10 for 10%).
-[disk]
-interval=30
-command=echo "HOME: $(~/.config/i3blocks/i3disk)"
+#[disk]
+#interval=30
+#command=echo "HOME: $(~/.config/i3blocks/i3disk)"
 
 
 # CPU usage
 #
 # The script may be called with -w and -c switches to specify thresholds,
 # see the script for details.
-[cpu_usage]
-command=echo "CPU: $(~/.config/i3blocks/i3cpu)"
-interval=1
-separator=false
+#[cpu_usage]
+#command=echo "CPU: $(~/.config/i3blocks/i3cpu)"
+#interval=1
+#separator=false
 
 [temp]
 command=echo "T: $(~/.config/i3blocks/i3temp)"
 interval=1
 seperator=true
 
-[uptime]
-command=echo "UPT: $(~/.config/i3blocks/i3uptime)"
-separator=true
-interval=60
+#[uptime]
+#command=echo "UPT: $(~/.config/i3blocks/i3uptime)"
+#separator=true
+#interval=60
 
 # Volume indicator
 #
