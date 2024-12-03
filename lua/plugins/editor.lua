@@ -67,14 +67,14 @@ return {
    --       require("mini.operators").setup()
    --    end,
    -- },
-   {
-      "m4xshen/hardtime.nvim",
-      event = "VeryLazy",
-      dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
-      opts = {
-         max_count = 20,
-      },
-   },
+   -- {
+   --    "m4xshen/hardtime.nvim",
+   --    event = "VeryLazy",
+   --    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+   --    opts = {
+   --       max_count = 20,
+   --    },
+   -- },
    {
       "LunarVim/bigfile.nvim",
       event = "VeryLazy",

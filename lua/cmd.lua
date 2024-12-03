@@ -7,3 +7,6 @@ local cmd = vim.api.nvim_create_user_command
 cmd("Jfmt", "%!jq --indent 4 .", {})
 cmd("MD", "! litemdview % &", {})
 cmd("Md", "! litemdview %:p & disown", {})
+
+vim.cmd([[cab cc CodeCompanion]])
+vim.cmd([[cab ca CodeCompanionChat Add]])

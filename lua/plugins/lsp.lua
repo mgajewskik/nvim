@@ -343,6 +343,7 @@ return {
                -- { name = "calc" },
                -- { name = "spell", keyword_length = 5 },
                { name = "rg", keyword_length = 5 },
+               -- { name = "supermaven" },
             },
          })
 
