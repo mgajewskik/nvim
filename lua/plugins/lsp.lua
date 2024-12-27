@@ -2,10 +2,10 @@ return {
    {
       "neovim/nvim-lspconfig",
       dependencies = {
-         { "folke/neodev.nvim", opts = { experimental = { pathStrict = true } } },
          "mason.nvim",
          "williamboman/mason-lspconfig.nvim",
-         "hrsh7th/cmp-nvim-lsp",
+         -- "hrsh7th/cmp-nvim-lsp",
+         "saghen/blink.cmp",
       },
       event = { "BufReadPre", "BufNewFile" },
       opts = {
@@ -32,6 +32,7 @@ return {
                -- filetypes = { "go", "gomod", "gohtmltmpl", "gotexttmpl" },
                settings = {
                   gopls = {
+                     gofumpt = true,
                      analyses = {
                         shadow = true,
                         unusedparams = true,
@@ -90,7 +91,8 @@ return {
          end
          vim.diagnostic.config(opts.diagnostics)
 
-         local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+         -- local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+         local capabilities = require("blink.cmp").get_lsp_capabilities(vim.lsp.protocol.make_client_capabilities())
          capabilities.textDocument.foldingRange = {
             dynamicRegistration = false,
             lineFoldingOnly = true,
@@ -140,108 +142,6 @@ return {
          end
       end,
    },
-   -- {
-   --    "jose-elias-alvarez/null-ls.nvim",
-   --    dependencies = {
-   --       "mason.nvim",
-   --    },
-   --    event = { "BufReadPre", "BufNewFile" },
-   --    -- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTIN_CONFIG.md
-   --    opts = function()
-   --       local nls = require("null-ls")
-   --       return {
-   --          sources = {
-   --             -- code actions
-   --             nls.builtins.code_actions.shellcheck,
-   --             nls.builtins.code_actions.gitsigns,
-   --             -- nls.builtins.code_actions.gomodifytags,
-   --             -- diagnostics
-   --             nls.builtins.diagnostics.actionlint,
-   --             nls.builtins.diagnostics.cfn_lint,
-   --             nls.builtins.diagnostics.yamllint,
-   --             nls.builtins.diagnostics.flake8.with({
-   --                extra_args = {
-   --                   "--max-line-length=120",
-   --                },
-   --             }),
-   --             -- turning off as throwing too many errors
-   --             -- nls.builtins.diagnostics.mypy,
-   --             -- nls.builtins.diagnostics.pylint,
-   --             -- nls.builtins.diagnostics.pyproject_flake8,
-   --             -- nls.builtins.diagnostics.ruff,
-   --             -- nls.builtins.diagnostics.checkmake,
-   --             -- nls.builtins.diagnostics.codespell,
-   --             nls.builtins.diagnostics.gitlint,
-   --             nls.builtins.diagnostics.commitlint,
-   --             nls.builtins.diagnostics.golangci_lint,
-   --             -- gives weird underlines if no package comment - managed by a config file
-   --             nls.builtins.diagnostics.revive,
-   --             -- nls.builtins.diagnostics.staticcheck,
-   --             nls.builtins.diagnostics.luacheck.with({
-   --                extra_args = {
-   --                   "--globals",
-   --                   "vim",
-   --                },
-   --             }),
-   --             nls.builtins.diagnostics.trail_space,
-   --             nls.builtins.diagnostics.tfsec,
-   --             -- nls.builtins.diagnostics.terraform_validate,
-   --             nls.builtins.diagnostics.buf,
-   --             nls.builtins.diagnostics.checkmake,
-   --             -- nls.builtins.diagnostics.dotenv_linter,
-   --             nls.builtins.diagnostics.hadolint,
-   --             nls.builtins.diagnostics.jsonlint,
-   --             nls.builtins.diagnostics.opacheck,
-   --             nls.builtins.diagnostics.sqlfluff.with({
-   --                extra_args = {
-   --                   "--dialect",
-   --                   "postgres",
-   --                },
-   --             }),
-   --             nls.builtins.diagnostics.djlint,
-   --             -- formatters
-   --             -- json formatting doesnt work
-   --             -- nls.builtins.formatting.fixjson,
-   --             nls.builtins.formatting.jq.with({
-   --                extra_args = {
-   --                   "--indent",
-   --                   "4",
-   --                },
-   --             }),
-   --             nls.builtins.formatting.yamlfmt,
-   --             nls.builtins.formatting.stylua.with({
-   --                extra_args = {
-   --                   "--indent-type",
-   --                   "Spaces",
-   --                   "--indent-width",
-   --                   "3",
-   --                },
-   --             }),
-   --             nls.builtins.formatting.shfmt,
-   --             nls.builtins.formatting.shellharden,
-   --             -- nls.builtins.formatting.terraform_fmt,
-   --             nls.builtins.formatting.isort,
-   --             nls.builtins.formatting.ruff,
-   --             nls.builtins.formatting.black,
-   --             -- nls.builtins.formatting.goimports,
-   --             -- nls.builtins.formatting.gofumpt,
-   --             -- nls.builtins.formatting.goimports_reviser,
-   --             -- nls.builtins.formatting.golines,
-   --             -- changes some strings that need to be like they are
-   --             -- nls.builtins.formatting.codespell,
-   --             nls.builtins.formatting.buf,
-   --             nls.builtins.formatting.cbfmt,
-   --             nls.builtins.formatting.djlint,
-   --             nls.builtins.formatting.packer,
-   --             nls.builtins.formatting.rego,
-   --             nls.builtins.formatting.sqlfluff,
-   --             nls.builtins.formatting.taplo,
-   --             nls.builtins.formatting.trim_newlines,
-   --             nls.builtins.formatting.trim_whitespace,
-   --          },
-   --       }
-   --    end,
-   -- },
    {
       "simrat39/symbols-outline.nvim",
       lazy = true,
@@ -254,120 +154,202 @@ return {
       opts = { use_diagnostic_signs = true },
    },
    {
-      "hrsh7th/nvim-cmp",
-      dependencies = {
-         "neovim/nvim-lspconfig",
-         "onsails/lspkind-nvim",
-         "hrsh7th/cmp-buffer",
-         "hrsh7th/cmp-nvim-lsp",
-         "hrsh7th/cmp-path",
-         "hrsh7th/cmp-cmdline",
-         "lukas-reineke/cmp-rg",
-         "hrsh7th/cmp-nvim-lsp-signature-help",
-         "hrsh7th/cmp-nvim-lsp-document-symbol",
-         "L3MON4D3/LuaSnip",
-         "hrsh7th/cmp-nvim-lua",
-         "petertriho/cmp-git",
+      "folke/lazydev.nvim",
+      ft = "lua",
+      cmd = "LazyDev",
+      opts = {
+         library = {
+            { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+            { path = "LazyVim", words = { "LazyVim" } },
+            { path = "snacks.nvim", words = { "Snacks" } },
+            { path = "lazy.nvim", words = { "LazyVim" } },
+         },
       },
-      config = function()
-         local cmp = require("cmp")
-         local lspkind = require("lspkind")
-
-         -- not sure this works as the group for copilot is not configured properly in cmp
-         vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
-
-         ---@diagnostic disable-next-line: missing-fields
-         cmp.setup({
-            ---@diagnostic disable-next-line: missing-fields
-            formatting = {
-               format = lspkind.cmp_format({
-                  with_text = false,
-                  maxwidth = 50,
-                  mode = "symbol",
-                  menu = {
-                     buffer = "BUF",
-                     rg = "RG",
-                     nvim_lsp = "LSP",
-                     path = "PATH",
-                     luasnip = "SNIP",
-                     calc = "CALC",
-                     spell = "SPELL",
-                     copilot = " COP",
-                  },
-                  before = function(entry, vim_item)
-                     if entry.source.name == "copilot" then
-                        -- vim_item.kind = "[] Copilot"
-                        vim_item.kind_hl_group = "CmpItemKindCopilot"
-                        return vim_item
-                     end
-                     return vim_item
-                  end,
-               }),
-            },
-            snippet = {
-               expand = function(args)
-                  require("luasnip").lsp_expand(args.body)
-               end,
-            },
-            mapping = {
-               ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-               ["<C-u>"] = cmp.mapping.scroll_docs(4),
-               ["<C-Space>"] = cmp.mapping.complete(),
-               ["<C-e>"] = cmp.mapping.close(),
-               ["<CR>"] = cmp.mapping.confirm({
-                  behavior = cmp.ConfirmBehavior.Replace,
-                  select = false,
-               }),
-               ["<Tab>"] = cmp.mapping(function(fallback)
-                  if cmp.visible() then
-                     cmp.select_next_item()
-                  else
-                     fallback()
-                  end
-               end, { "i", "s" }),
-               ["<S-Tab>"] = cmp.mapping(function()
-                  if cmp.visible() then
-                     cmp.select_prev_item()
-                  end
-               end, { "i", "s" }),
-            },
-            sources = {
-               -- { name = "copilot", group_index = 2 },
-               { name = "nvim_lua" },
-               { name = "path" },
-               { name = "nvim_lsp" },
-               { name = "nvim_lsp_signature_help" },
-               { name = "git" },
-               { name = "buffer", keyword_length = 5 },
-               { name = "luasnip" },
-               -- { name = "calc" },
-               -- { name = "spell", keyword_length = 5 },
-               { name = "rg", keyword_length = 5 },
-               -- { name = "supermaven" },
-            },
-         })
-
-         -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-         ---@diagnostic disable-next-line: missing-fields
-         cmp.setup.cmdline("/", {
-            mapping = cmp.mapping.preset.cmdline(),
-            sources = cmp.config.sources({
-               { name = "nvim_lsp_document_symbol" },
-            }, {
-               { name = "buffer" },
-            }),
-         })
-
-         -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-         ---@diagnostic disable-next-line: missing-fields
-         cmp.setup.cmdline(":", {
-            mapping = cmp.mapping.preset.cmdline(),
-            sources = cmp.config.sources({
-               { name = "path" },
-            }, {
-               { name = "cmdline" },
-            }),
-         })
-      end,
    },
+   {
+      -- https://cmp.saghen.dev/
+      "saghen/blink.cmp",
+      dependencies = {
+         "rafamadriz/friendly-snippets",
+         "mikavilpas/blink-ripgrep.nvim",
+         "folke/lazydev.nvim",
+      },
+      version = "*",
+      opts = {
+         keymap = {
+            preset = "enter",
+            ["<CR>"] = { "fallback" },
+            ["<C-j>"] = { "select_next", "fallback" },
+            ["<C-k>"] = { "select_prev", "fallback" },
+            ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+            ["<C-u>"] = { "scroll_documentation_up", "fallback" },
+         },
+         completion = {
+            accept = { auto_brackets = { enabled = true } },
+            list = { selection = "auto_insert" },
+            documentation = {
+               auto_show = true,
+               auto_show_delay_ms = 250,
+               treesitter_highlighting = true,
+               window = {
+                  max_width = 120,
+                  max_height = 60,
+               },
+            },
+            ghost_text = { enabled = false },
+         },
+         signature = {
+            enabled = true,
+         },
+         appearance = {
+            nerd_font_variant = "mono",
+         },
+         sources = {
+            default = function()
+               local cwd = vim.fn.getcwd()
+               if cwd == vim.fn.expand("$HOME") or cwd == vim.fn.expand("$HOME/.config") then
+                  return { "lazydev", "lsp", "path", "buffer" }
+               else
+                  return { "lazydev", "lsp", "path", "buffer", "ripgrep" }
+               end
+            end,
+            cmdline = function()
+               local type = vim.fn.getcmdtype()
+               if type == "/" or type == "?" then
+                  return { "buffer" }
+               end
+               if type == ":" then
+                  return { "cmdline" }
+               end
+               return {}
+            end,
+            providers = {
+               ripgrep = {
+                  module = "blink-ripgrep",
+                  name = "Ripgrep",
+                  opts = {
+                     prefix_min_len = 3,
+                     context_size = 5,
+                     max_filesize = "1M",
+                     project_root_marker = { ".git", "go.mod" },
+                     search_casing = "--smart-case",
+                     additional_rg_options = {},
+                     fallback_to_regex_highlighting = true,
+                  },
+               },
+               lazydev = {
+                  name = "LazyDev",
+                  module = "lazydev.integrations.blink",
+                  -- make lazydev completions top priority (see `:h blink.cmp`)
+                  score_offset = 100,
+               },
+            },
+         },
+      },
+   },
+   -- {
+   --    "hrsh7th/nvim-cmp",
+   --    dependencies = {
+   --       "neovim/nvim-lspconfig",
+   --       "onsails/lspkind-nvim",
+   --       "hrsh7th/cmp-buffer",
+   --       "hrsh7th/cmp-nvim-lsp",
+   --       "hrsh7th/cmp-path",
+   --       "hrsh7th/cmp-cmdline",
+   --       "lukas-reineke/cmp-rg",
+   --       "hrsh7th/cmp-nvim-lsp-signature-help",
+   --       "hrsh7th/cmp-nvim-lsp-document-symbol",
+   --       "L3MON4D3/LuaSnip",
+   --       "hrsh7th/cmp-nvim-lua",
+   --       "petertriho/cmp-git",
+   --    },
+   --    config = function()
+   --       local cmp = require("cmp")
+   --       local lspkind = require("lspkind")
+   --
+   --       ---@diagnostic disable-next-line: missing-fields
+   --       cmp.setup({
+   --          ---@diagnostic disable-next-line: missing-fields
+   --          formatting = {
+   --             format = lspkind.cmp_format({
+   --                with_text = false,
+   --                maxwidth = 50,
+   --                mode = "symbol",
+   --                menu = {
+   --                   buffer = "BUF",
+   --                   rg = "RG",
+   --                   nvim_lsp = "LSP",
+   --                   path = "PATH",
+   --                   luasnip = "SNIP",
+   --                   calc = "CALC",
+   --                   spell = "SPELL",
+   --                },
+   --             }),
+   --          },
+   --          snippet = {
+   --             expand = function(args)
+   --                require("luasnip").lsp_expand(args.body)
+   --             end,
+   --          },
+   --          mapping = {
+   --             ["<C-d>"] = cmp.mapping.scroll_docs(4),
+   --             ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+   --             ["<C-Space>"] = cmp.mapping.complete(),
+   --             ["<C-e>"] = cmp.mapping.close(),
+   --             ["<CR>"] = cmp.mapping.confirm({
+   --                behavior = cmp.ConfirmBehavior.Replace,
+   --                select = false,
+   --             }),
+   --             ["<C-j>"] = cmp.mapping(function(fallback)
+   --                if cmp.visible() then
+   --                   cmp.select_next_item()
+   --                else
+   --                   fallback()
+   --                end
+   --             end, { "i", "s" }),
+   --             ["<C-k>"] = cmp.mapping(function()
+   --                if cmp.visible() then
+   --                   cmp.select_prev_item()
+   --                end
+   --             end, { "i", "s" }),
+   --          },
+   --          sources = {
+   --             -- { name = "copilot", group_index = 2 },
+   --             { name = "nvim_lua" },
+   --             { name = "path" },
+   --             { name = "nvim_lsp" },
+   --             { name = "nvim_lsp_signature_help" },
+   --             { name = "git" },
+   --             { name = "buffer", keyword_length = 5 },
+   --             { name = "luasnip" },
+   --             -- { name = "calc" },
+   --             -- { name = "spell", keyword_length = 5 },
+   --             { name = "rg", keyword_length = 5 },
+   --             -- { name = "supermaven" },
+   --          },
+   --       })
+   --
+   --       -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+   --       ---@diagnostic disable-next-line: missing-fields
+   --       cmp.setup.cmdline("/", {
+   --          mapping = cmp.mapping.preset.cmdline(),
+   --          sources = cmp.config.sources({
+   --             { name = "nvim_lsp_document_symbol" },
+   --          }, {
+   --             { name = "buffer" },
+   --          }),
+   --       })
+   --
+   --       -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+   --       ---@diagnostic disable-next-line: missing-fields
+   --       cmp.setup.cmdline(":", {
+   --          mapping = cmp.mapping.preset.cmdline(),
+   --          sources = cmp.config.sources({
+   --             { name = "path" },
+   --          }, {
+   --             { name = "cmdline" },
+   --          }),
+   --       })
+   --    end,
+   -- },
 }
