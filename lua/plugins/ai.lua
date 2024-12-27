@@ -24,12 +24,17 @@ return {
    -- },
    {
       "supermaven-inc/supermaven-nvim",
+      lazy = false,
+      keys = {
+         { "<leader>cc", ":SupermavenToggle<CR>", { noremap = true, silent = true } },
+      },
       config = function()
          require("supermaven-nvim").setup({
             keymaps = {
-               accept_suggestion = "<C-j>",
+               accept_suggestion = "<Tab>",
                accept_word = "<C-l>",
             },
+            ignore_filetypes = { "markdown", "codecompanion" },
          })
       end,
    },
@@ -38,8 +43,7 @@ return {
       dependencies = {
          "nvim-lua/plenary.nvim",
          "nvim-treesitter/nvim-treesitter",
-         -- The following are optional:
-         { "MeanderingProgrammer/render-markdown.nvim", ft = { "markdown", "codecompanion" } },
+         { "MeanderingProgrammer/render-markdown.nvim", ft = { "codecompanion" } },
       },
       keys = {
          { "<C-f>", ":CodeCompanionChat Toggle<CR>", { noremap = true, silent = true } },
@@ -50,8 +54,15 @@ return {
       opts = {
          display = {
             chat = {
+               window = {
+                  -- this is only because it is covering other files when turned on and changin layout of them
+                  layout = "float",
+               },
                render_headers = false, -- Use RenderMarkdown instead
             },
+            -- action_palette = {
+            --    provider = "fzf_lua",
+            -- },
          },
          strategies = {
             chat = {

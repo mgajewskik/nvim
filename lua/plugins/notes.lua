@@ -39,7 +39,7 @@ return {
       end,
       config = function()
          -- TODO cleanup this mess
-         local home = vim.fn.expand("~/dropbox/obsidian")
+         local home = vim.fn.expand("$NOTES_PATH")
 
          require("telekasten").setup({
             home = home,

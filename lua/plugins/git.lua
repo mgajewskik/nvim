@@ -39,6 +39,7 @@ return {
       dependencies = {
          "nvim-lua/plenary.nvim",
          "sindrets/diffview.nvim",
+         "ibhagwan/fzf-lua",
       },
       lazy = true,
       cmd = "Neogit",
@@ -48,6 +49,7 @@ return {
       opts = {
          integrations = {
             diffview = true,
+            fzf_lua = true,
          },
       },
       -- config = true,
@@ -77,27 +79,46 @@ return {
       -- d	Open diffview.nvim at hovered file
       -- D (TODO)	Open diff popup
    },
+   -- {
+   --    -- https://github.com/pwntester/octo.nvim
+   --    "pwntester/octo.nvim",
+   --    requires = {
+   --       "nvim-lua/plenary.nvim",
+   --       "nvim-telescope/telescope.nvim",
+   --       "kyazdani42/nvim-web-devicons",
+   --    },
+   --    lazy = true,
+   --    cmd = "Octo",
+   --    keys = {
+   --       -- other commands
+   --       -- Octo pr edit <PR number>
+   --       -- Octo review start/resume
+   --       -- <leader>ca/sa - add comment, suggestion
+   --       -- Octo review comments
+   --       -- Octo review submit
+   --       { "<leader>gp", ":Octo pr list<CR>", { noremap = true, silent = true } },
+   --    },
+   --    config = function()
+   --       require("octo").setup()
+   --    end,
+   -- },
    {
-      -- https://github.com/pwntester/octo.nvim
-      "pwntester/octo.nvim",
-      requires = {
+      "harrisoncramer/gitlab.nvim",
+      dependencies = {
+         "MunifTanjim/nui.nvim",
          "nvim-lua/plenary.nvim",
-         "nvim-telescope/telescope.nvim",
-         "kyazdani42/nvim-web-devicons",
+         "sindrets/diffview.nvim",
+         "stevearc/dressing.nvim", -- Recommended but not required. Better UI for pickers.
+         "nvim-tree/nvim-web-devicons", -- Recommended but not required. Icons in discussion tree.
       },
-      lazy = true,
-      cmd = "Octo",
+      build = function()
+         require("gitlab.server").build(true)
+      end, -- Builds the Go binary
       keys = {
-         -- other commands
-         -- Octo pr edit <PR number>
-         -- Octo review start/resume
-         -- <leader>ca/sa - add comment, suggestion
-         -- Octo review comments
-         -- Octo review submit
-         { "<leader>gp", ":Octo pr list<CR>", { noremap = true, silent = true } },
+         { "<leader>gm", ":lua require('gitlab').choose_merge_request()<CR>", { noremap = true } },
       },
       config = function()
-         require("octo").setup()
+         require("gitlab").setup()
       end,
    },
 }

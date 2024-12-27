@@ -35,7 +35,7 @@ return {
          icons = { breakpoint = "B", currentpos = "C" }, -- setup to `false` to disable icons setup
          build_tags = "",
          run_in_floaterm = true,
-         luasnip = true,
+         -- luasnip = true,
          lsp_inlay_hints = {
             enable = false, -- cannot be false as it throuws an error at LSP setup
             -- -- Only show inlay hints for the current line
@@ -84,6 +84,7 @@ return {
             -- python = { "isort", "black", "ruff" },
             python = { "isort", "ruff_fix", "black", "ruff_format" },
             go = { "golines", "gofumpt", "goimports" },
+            -- go = { "golines", "gofumpt", "goimports-reviser" },  -- reviser needs additional setup to change the order of imported groups
             json = { "jq" },
             yaml = { "yamlfmt" },
             sh = { "shfmt", "shellcheck", "shellharden" },
@@ -103,8 +104,7 @@ return {
             if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
                return
             end
-            -- return { timeout_ms = 500, lsp_fallback = "always" }
-            return { timeout_ms = 500, lsp_fallback = true }
+            return { timeout_ms = 1000, lsp_format = "fallback" }
          end,
       },
       config = function(_, opts)
@@ -202,6 +202,7 @@ return {
             "golines",
             "gofumpt",
             "goimports",
+            "goimports-reviser",
             "jq",
             "yamlfmt",
             "shfmt",

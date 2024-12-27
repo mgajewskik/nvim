@@ -87,6 +87,8 @@ return {
             "go",
             "gomod",
             "gowork",
+            "gosum",
+            "gotmpl",
             "proto",
             "hcl",
             "terraform",
