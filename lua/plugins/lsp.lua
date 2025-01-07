@@ -178,7 +178,7 @@ return {
       opts = {
          keymap = {
             preset = "enter",
-            ["<CR>"] = { "fallback" },
+            ["<CR>"] = { "accept", "fallback" },
             ["<C-j>"] = { "select_next", "fallback" },
             ["<C-k>"] = { "select_prev", "fallback" },
             ["<C-d>"] = { "scroll_documentation_down", "fallback" },
@@ -208,9 +208,9 @@ return {
             default = function()
                local cwd = vim.fn.getcwd()
                if cwd == vim.fn.expand("$HOME") or cwd == vim.fn.expand("$HOME/.config") then
-                  return { "lazydev", "lsp", "path", "buffer" }
+                  return { "lazydev", "lsp", "path", "buffer", "codecompanion" }
                else
-                  return { "lazydev", "lsp", "path", "buffer", "ripgrep" }
+                  return { "lazydev", "lsp", "path", "buffer", "codecompanion", "ripgrep" }
                end
             end,
             cmdline = function()
@@ -224,16 +224,20 @@ return {
                return {}
             end,
             providers = {
+               codecompanion = {
+                  name = "CodeCompanion",
+                  module = "codecompanion.providers.completion.blink",
+               },
                ripgrep = {
                   module = "blink-ripgrep",
                   name = "Ripgrep",
                   opts = {
-                     prefix_min_len = 3,
+                     prefix_min_len = 5,
                      context_size = 5,
                      max_filesize = "1M",
                      project_root_marker = { ".git", "go.mod" },
                      search_casing = "--smart-case",
-                     additional_rg_options = {},
+                     additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
                      fallback_to_regex_highlighting = true,
                   },
                },
@@ -259,7 +263,7 @@ return {
    --       "lukas-reineke/cmp-rg",
    --       "hrsh7th/cmp-nvim-lsp-signature-help",
    --       "hrsh7th/cmp-nvim-lsp-document-symbol",
-   --       "L3MON4D3/LuaSnip",
+   --       -- "L3MON4D3/LuaSnip",
    --       "hrsh7th/cmp-nvim-lua",
    --       "petertriho/cmp-git",
    --    },
@@ -273,7 +277,7 @@ return {
    --          formatting = {
    --             format = lspkind.cmp_format({
    --                with_text = false,
-   --                maxwidth = 50,
+   --                maxwidth = 120,
    --                mode = "symbol",
    --                menu = {
    --                   buffer = "BUF",
@@ -286,11 +290,11 @@ return {
    --                },
    --             }),
    --          },
-   --          snippet = {
-   --             expand = function(args)
-   --                require("luasnip").lsp_expand(args.body)
-   --             end,
-   --          },
+   --          -- snippet = {
+   --          --    expand = function(args)
+   --          --       require("luasnip").lsp_expand(args.body)
+   --          --    end,
+   --          -- },
    --          mapping = {
    --             ["<C-d>"] = cmp.mapping.scroll_docs(4),
    --             ["<C-u>"] = cmp.mapping.scroll_docs(-4),
@@ -314,7 +318,6 @@ return {
    --             end, { "i", "s" }),
    --          },
    --          sources = {
-   --             -- { name = "copilot", group_index = 2 },
    --             { name = "nvim_lua" },
    --             { name = "path" },
    --             { name = "nvim_lsp" },
@@ -322,10 +325,7 @@ return {
    --             { name = "git" },
    --             { name = "buffer", keyword_length = 5 },
    --             { name = "luasnip" },
-   --             -- { name = "calc" },
-   --             -- { name = "spell", keyword_length = 5 },
    --             { name = "rg", keyword_length = 5 },
-   --             -- { name = "supermaven" },
    --          },
    --       })
    --
