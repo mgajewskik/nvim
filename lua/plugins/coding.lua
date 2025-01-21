@@ -11,7 +11,7 @@ return {
       ft = { "go", "gomod" },
       build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
       opts = {
-         goimports = "golines",
+         -- goimports = "golines",
          lsp_cfg = true,
          lsp_gofumpt = true,
          -- lsp_on_attach = nil,
@@ -83,11 +83,14 @@ return {
             lua = { "stylua" },
             -- python = { "isort", "black", "ruff" },
             python = { "isort", "ruff_fix", "black", "ruff_format" },
-            go = { "golines", "gofumpt", "goimports" },
+            -- go = { "golines", "gofumpt", "goimports" },
+            -- go = { "gofumpt", "goimports" },
+            go = { "goimports" },
             -- go = { "golines", "gofumpt", "goimports-reviser" },  -- reviser needs additional setup to change the order of imported groups
             json = { "jq" },
             yaml = { "yamlfmt" },
-            sh = { "shfmt", "shellcheck", "shellharden" },
+            -- sh = { "shfmt", "shellcheck", "shellharden" },
+            sh = { "shfmt" },
             toml = { "taplo" },
             sql = { "pg_format" },
             gohtmltmpl = { "djlint" },
@@ -154,7 +157,8 @@ return {
             -- yaml = { "actionlint", "cfn_lint", "yamllint" },
             -- yaml = { "actionlint", "yamllint" },
             yaml = { "yamllint" },
-            go = { "golangcilint", "revive" }, -- golangci-lint is not working
+            go = { "golangcilint" }, -- golangci-lint is not working
+            -- go = { "golangcilint", "revive" }, -- golangci-lint is not working
             -- go = { "revive" },
             lua = { "luacheck" },
             terraform = { "tfsec" },

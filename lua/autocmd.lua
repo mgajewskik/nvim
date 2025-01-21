@@ -54,14 +54,16 @@ augroup("NoNewlineNoAutoComments", function(g)
    })
 end)
 
+-- NOTE: this breaks Golang templates which have tabs in some newlines
+-- it would be good to be able to disable this directly in the conform config with DisableFormat
 --- Remove all trailing whitespace on save
-augroup("TrimWhiteSpaceGrp", function(g)
-   aucmd("BufWritePre", {
-      group = g,
-      pattern = "*",
-      command = [[:%s/\s\+$//e]],
-   })
-end)
+-- augroup("TrimWhiteSpaceGrp", function(g)
+--    aucmd("BufWritePre", {
+--       group = g,
+--       pattern = "*",
+--       command = [[:%s/\s\+$//e]],
+--    })
+-- end)
 
 --- Remove all trailing new lines on save
 augroup("TrimNewLinesGrp", function(g)

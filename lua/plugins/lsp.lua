@@ -32,6 +32,7 @@ return {
                -- filetypes = { "go", "gomod", "gohtmltmpl", "gotexttmpl" },
                settings = {
                   gopls = {
+                     remote = "auto",
                      gofumpt = true,
                      analyses = {
                         shadow = true,
@@ -41,6 +42,9 @@ return {
                      staticcheck = true,
                      formatting = {
                         gofumpt = true,
+                     },
+                     telemetry = {
+                        enable = false,
                      },
                   },
                },
@@ -157,14 +161,7 @@ return {
       "folke/lazydev.nvim",
       ft = "lua",
       cmd = "LazyDev",
-      opts = {
-         library = {
-            { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-            { path = "LazyVim", words = { "LazyVim" } },
-            { path = "snacks.nvim", words = { "Snacks" } },
-            { path = "lazy.nvim", words = { "LazyVim" } },
-         },
-      },
+      opts = {},
    },
    {
       -- https://cmp.saghen.dev/
@@ -173,20 +170,13 @@ return {
          "rafamadriz/friendly-snippets",
          "mikavilpas/blink-ripgrep.nvim",
          "folke/lazydev.nvim",
+         "moyiz/blink-emoji.nvim",
       },
       version = "*",
       opts = {
-         keymap = {
-            preset = "enter",
-            ["<CR>"] = { "accept", "fallback" },
-            ["<C-j>"] = { "select_next", "fallback" },
-            ["<C-k>"] = { "select_prev", "fallback" },
-            ["<C-d>"] = { "scroll_documentation_down", "fallback" },
-            ["<C-u>"] = { "scroll_documentation_up", "fallback" },
-         },
          completion = {
             accept = { auto_brackets = { enabled = true } },
-            list = { selection = "auto_insert" },
+            list = { selection = { auto_insert = true } },
             documentation = {
                auto_show = true,
                auto_show_delay_ms = 250,
@@ -194,6 +184,11 @@ return {
                window = {
                   max_width = 120,
                   max_height = 60,
+               },
+            },
+            menu = {
+               draw = {
+                  treesitter = { "lsp" },
                },
             },
             ghost_text = { enabled = false },
@@ -204,12 +199,28 @@ return {
          appearance = {
             nerd_font_variant = "mono",
          },
+         keymap = {
+            preset = "enter",
+            ["<CR>"] = { "accept", "fallback" },
+            ["<C-j>"] = { "select_next", "fallback" },
+            ["<C-k>"] = { "select_prev", "fallback" },
+            ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+            ["<C-u>"] = { "scroll_documentation_up", "fallback" },
+            cmdline = {
+               preset = "none",
+               ["<CR>"] = { "fallback" },
+               ["<C-j>"] = { "select_next", "fallback" },
+               ["<C-k>"] = { "select_prev", "fallback" },
+            },
+         },
          sources = {
             default = function()
                local cwd = vim.fn.getcwd()
                if cwd == vim.fn.expand("$HOME") or cwd == vim.fn.expand("$HOME/.config") then
+                  -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji" }
                   return { "lazydev", "lsp", "path", "buffer", "codecompanion" }
                else
+                  -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji", "ripgrep" }
                   return { "lazydev", "lsp", "path", "buffer", "codecompanion", "ripgrep" }
                end
             end,
@@ -246,6 +257,12 @@ return {
                   module = "lazydev.integrations.blink",
                   -- make lazydev completions top priority (see `:h blink.cmp`)
                   score_offset = 100,
+               },
+               emoji = {
+                  module = "blink-emoji",
+                  name = "Emoji",
+                  score_offset = 15, -- Tune by preference
+                  opts = { insert = true }, -- Insert emoji (default) or complete its name
                },
             },
          },
