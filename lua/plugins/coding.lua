@@ -82,7 +82,8 @@ return {
          formatters_by_ft = {
             lua = { "stylua" },
             -- python = { "isort", "black", "ruff" },
-            python = { "isort", "ruff_fix", "black", "ruff_format" },
+            -- python = { "isort", "ruff_fix", "ruff_format", "ruff_organize_imports" },
+            python = { "isort", "ruff_organize_imports" },
             -- go = { "golines", "gofumpt", "goimports" },
             -- go = { "gofumpt", "goimports" },
             go = { "goimports" },

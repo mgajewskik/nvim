@@ -123,6 +123,7 @@ return {
          { "<leader>sw", ":FzfLua files cwd=$WORKSPACE/notes/<CR>", { noremap = true } },
          { "<leader>f", ":FzfLua git_files<CR>", { noremap = true } },
          { "<leader>`", ":FzfLua buffers<CR>", { noremap = true } },
+         { "<leader><leader>", ":FzfLua buffers<CR>", { noremap = true } },
          { "<leader>\\\\", ":FzfLua grep_visual<CR>", { noremap = true } },
          { "\\\\", ":FzfLua live_grep_glob<CR>", { noremap = true } },
          { "//", ":FzfLua blines<CR>", { noremap = true } },
