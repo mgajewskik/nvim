@@ -1,5 +1,22 @@
 return {
    {
+      "karb94/neoscroll.nvim",
+      opts = {
+         hide_cursor = false,
+         -- easing = "circular",
+         duration_multiplier = 0.5,
+         mappings = {
+            "<C-u>",
+            "<C-d>",
+            "<C-b>",
+            "<C-y>",
+            "zt",
+            "zz",
+            "zb",
+         },
+      },
+   },
+   {
       "akinsho/toggleterm.nvim",
       lazy = true,
       keys = {
