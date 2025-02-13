@@ -39,6 +39,7 @@ return {
          open_for_directories = true,
          keymaps = {
             show_help = "<f1>",
+            change_working_directory = "<c-d>",
          },
          floating_window_scaling_factor = 0.7,
          integrations = {

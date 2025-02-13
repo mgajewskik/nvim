@@ -50,19 +50,20 @@ if vim.fn.has("nvim-0.9.0") == 1 then
    o.shortmess:append({ C = true })
 end
 
-o.list = false -- Show some invisible characters (tabs...
+o.list = true -- Show some invisible characters (tabs...
 o.listchars = {
-   tab = "→ ",
-   eol = "↲",
-   nbsp = "␣",
-   lead = " ",
-   space = " ",
-   trail = "␣",
-   -- lead      = '␣'   ,
-   -- space     = '␣'   ,
-   -- trail     = '•'   ,
-   extends = "⟩",
-   precedes = "⟨",
+   -- tab = "→ ",
+   tab = ">-",
+   -- eol = "↲",
+   -- nbsp = "␣",
+   -- lead = " ",
+   -- space = " ",
+   -- trail = "␣",
+   -- -- lead      = '␣'   ,
+   -- -- space     = '␣'   ,
+   -- -- trail     = '•'   ,
+   -- extends = "⟩",
+   -- precedes = "⟨",
 }
 o.showbreak = "↪ "
 

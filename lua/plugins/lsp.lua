@@ -77,6 +77,7 @@ return {
             marksman = {},
             vimls = {},
             spectral = {},
+            -- TODO add taplo to this setup
          },
          setup = {},
       },

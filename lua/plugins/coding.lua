@@ -72,7 +72,7 @@ return {
       config = function()
          vim.cmd("let g:terraform_align=1")
          vim.cmd("let g:terraform_fold_sections=0")
-         vim.cmd("let g:terraform_fmt_on_save=0")
+         vim.cmd("let g:terraform_fmt_on_save=1")
          vim.cmd("let g:hcl_align=1")
       end,
    },
@@ -90,12 +90,12 @@ return {
             -- go = { "golines", "gofumpt", "goimports-reviser" },  -- reviser needs additional setup to change the order of imported groups
             json = { "jq" },
             yaml = { "yamlfmt" },
-            -- sh = { "shfmt", "shellcheck", "shellharden" },
-            sh = { "shfmt" },
+            sh = { "shfmt", "shellcheck", "shellharden" },
+            -- sh = { "shfmt" },
             toml = { "taplo" },
             sql = { "pg_format" },
             gohtmltmpl = { "djlint" },
-            terraform = { "terraform_fmt" },
+            -- terraform = { "terraform_fmt" },  -- moves cursor to the end of the file
             hcl = { "terraform_fmt" },
             nix = { "nixfmt" },
          },
@@ -108,7 +108,7 @@ return {
             if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
                return
             end
-            return { timeout_ms = 1000, lsp_format = "fallback" }
+            return { timeout_ms = 1000, lsp_format = "never" }
          end,
       },
       config = function(_, opts)
