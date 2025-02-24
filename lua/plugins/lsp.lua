@@ -207,12 +207,24 @@ return {
             ["<C-k>"] = { "select_prev", "fallback" },
             ["<C-d>"] = { "scroll_documentation_down", "fallback" },
             ["<C-u>"] = { "scroll_documentation_up", "fallback" },
-            cmdline = {
+         },
+         cmdline = {
+            keymap = {
                preset = "none",
                ["<CR>"] = { "fallback" },
                ["<C-j>"] = { "select_next", "fallback" },
                ["<C-k>"] = { "select_prev", "fallback" },
             },
+            sources = function()
+               local type = vim.fn.getcmdtype()
+               if type == "/" or type == "?" then
+                  return { "buffer" }
+               end
+               if type == ":" then
+                  return { "cmdline" }
+               end
+               return {}
+            end,
          },
          sources = {
             default = function()
@@ -224,16 +236,6 @@ return {
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji", "ripgrep" }
                   return { "lazydev", "lsp", "path", "buffer", "codecompanion", "ripgrep" }
                end
-            end,
-            cmdline = function()
-               local type = vim.fn.getcmdtype()
-               if type == "/" or type == "?" then
-                  return { "buffer" }
-               end
-               if type == ":" then
-                  return { "cmdline" }
-               end
-               return {}
             end,
             providers = {
                codecompanion = {

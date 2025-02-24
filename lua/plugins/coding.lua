@@ -11,6 +11,9 @@ return {
       ft = { "go", "gomod" },
       build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
       opts = {
+         remap_commands = {
+            GoDoc = false,
+         },
          -- goimports = "golines",
          lsp_cfg = true,
          lsp_gofumpt = true,
@@ -68,6 +71,29 @@ return {
       },
    },
    {
+      "fredrikaverpil/godoc.nvim",
+      version = "*",
+      dependencies = {
+         { "folke/snacks.nvim" }, -- optional
+         {
+            "nvim-treesitter/nvim-treesitter",
+            opts = {
+               ensure_installed = { "go" },
+            },
+         },
+      },
+      -- build = "go install github.com/lotusirous/gostdsym/stdsym@latest", -- optional
+      cmd = { "GoDoc" },
+      opts = {
+         window = {
+            type = "vsplit",
+         },
+         picker = {
+            type = "snacks",
+         },
+      },
+   },
+   {
       "hashivim/vim-terraform",
       config = function()
          vim.cmd("let g:terraform_align=1")
@@ -90,9 +116,9 @@ return {
             -- go = { "golines", "gofumpt", "goimports-reviser" },  -- reviser needs additional setup to change the order of imported groups
             json = { "jq" },
             yaml = { "yamlfmt" },
-            sh = { "shfmt", "shellcheck", "shellharden" },
-            -- sh = { "shfmt" },
-            toml = { "taplo" },
+            -- sh = { "shfmt", "shellcheck", "shellharden" },
+            sh = { "shfmt" },
+            -- toml = { "taplo" },
             sql = { "pg_format" },
             gohtmltmpl = { "djlint" },
             -- terraform = { "terraform_fmt" },  -- moves cursor to the end of the file

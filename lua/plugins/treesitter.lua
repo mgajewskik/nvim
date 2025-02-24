@@ -49,7 +49,7 @@ return {
             max_file_lines = 2000, -- Do not enable for files with more than specified lines
          },
          incremental_selection = {
-            enable = false,
+            enable = true,
             keymaps = {
                init_selection = "<CR>",
                node_incremental = "<CR>",
@@ -59,6 +59,18 @@ return {
          },
          -- should be in editor config but it can't
          textobjects = {
+            move = {
+               enable = true,
+               set_jumps = true,
+               goto_next_start = {
+                  ["]]"] = "@function.outer",
+                  ["]m"] = "@class.outer",
+               },
+               goto_previous_start = {
+                  ["[[]"] = "@function.outer",
+                  ["[m"] = "@class.outer",
+               },
+            },
             select = {
                enable = true,
                -- Automatically jump forward to textobj, similar to targets.vim

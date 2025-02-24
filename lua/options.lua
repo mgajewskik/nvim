@@ -15,10 +15,10 @@ o.ignorecase = true -- Ignore case
 o.inccommand = "nosplit" -- preview incremental substitute
 o.laststatus = 0
 o.mouse = "a" -- Enable mouse mode
-o.number = true -- Print line number
+o.number = false -- Print line number
 o.pumblend = 10 -- Popup blend
 o.pumheight = 10 -- Maximum number of entries in a popup
-o.relativenumber = true -- Relative line numbers
+o.relativenumber = false -- Relative line numbers
 o.scrolloff = 4 -- Lines of context
 o.sessionoptions = { "buffers", "curdir", "tabpages", "winsize" }
 o.shiftround = true -- Round indent
@@ -50,7 +50,7 @@ if vim.fn.has("nvim-0.9.0") == 1 then
    o.shortmess:append({ C = true })
 end
 
-o.list = true -- Show some invisible characters (tabs...
+o.list = false -- Show some invisible characters (tabs...
 o.listchars = {
    -- tab = "→ ",
    tab = ">-",
@@ -66,6 +66,17 @@ o.listchars = {
    -- precedes = "⟨",
 }
 o.showbreak = "↪ "
+
+-- Make splits more visible
+o.fillchars = {
+   horiz = "━",
+   horizup = "┻",
+   horizdown = "┳",
+   vert = "┃",
+   vertleft = "┫",
+   vertright = "┣",
+   verthoriz = "╋",
+}
 
 o.formatoptions = "jcroqlnt" -- tcqj
 -- -- c: auto-wrap comments using textwidth
