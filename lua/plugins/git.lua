@@ -3,7 +3,7 @@ return {
       "tpope/vim-fugitive",
       lazy = true,
       keys = {
-         { "<leader>gs", "<Esc>:Git<CR>", { noremap = true } },
+         { "<leader>sg", "<Esc>:Git<CR>", { noremap = true } },
          { "<leader>gb", "<Esc>:Git blame<CR>", { noremap = true } },
          { "<leader>gc", "<Esc>:Git commit<CR>", { noremap = true } },
          { "<leader>gv", "<Esc>:Gvdiffsplit!<CR>", { noremap = true } },
@@ -44,7 +44,7 @@ return {
       lazy = true,
       cmd = "Neogit",
       keys = {
-         { "<leader>sg", ":Neogit<CR>", { noremap = true, silent = true } },
+         { "<leader>gs", ":Neogit<CR>", { noremap = true, silent = true } },
       },
       opts = {
          integrations = {

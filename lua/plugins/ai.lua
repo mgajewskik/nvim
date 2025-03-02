@@ -39,6 +39,7 @@ return {
       end,
    },
    {
+      -- https://codecompanion.olimorris.dev/
       "olimorris/codecompanion.nvim",
       dependencies = {
          "nvim-lua/plenary.nvim",
@@ -52,6 +53,20 @@ return {
       -- https://github.com/olimorris/codecompanion.nvim/blob/main/lua/codecompanion/config.lua
       -- https://github.com/oca159/lazyvim/blob/main/lua/plugins/codecompanion.lua
       opts = {
+         adapters = {
+            anthropic = function()
+               return require("codecompanion.adapters").extend("anthropic", {
+                  schema = {
+                     model = {
+                        default = "claude-3-7-sonnet-20250219",
+                     },
+                     -- thinking = {
+                     --    type = "disabled",
+                     -- },
+                  },
+               })
+            end,
+         },
          display = {
             chat = {
                window = {
@@ -60,32 +75,33 @@ return {
                },
                render_headers = false, -- Use RenderMarkdown instead
             },
-            -- action_palette = {
-            --    provider = "fzf_lua",
-            -- },
+            action_palette = {
+               provider = "telescope",
+            },
          },
+         -- fzf_lua will work after this is merged: https://github.com/olimorris/codecompanion.nvim/pull/872
          strategies = {
             chat = {
                adapter = "anthropic",
                slash_commands = {
                   ["buffer"] = {
                      opts = {
-                        provider = "fzf_lua",
+                        provider = "telescope",
                      },
                   },
                   ["file"] = {
                      opts = {
-                        provider = "fzf_lua",
+                        provider = "telescope",
                      },
                   },
                   ["help"] = {
                      opts = {
-                        provider = "fzf_lua",
+                        provider = "telescope",
                      },
                   },
                   ["symbols"] = {
                      opts = {
-                        provider = "fzf_lua",
+                        provider = "telescope",
                      },
                   },
                },

@@ -12,6 +12,10 @@ map("i", "jj", "<Esc>l", default_opts)
 map("i", "jk", "<Esc>l", default_opts)
 map("i", "kj", "<Esc>l", default_opts)
 
+-- use these when neoscroll is dosabled
+-- map("n", "<C-u>", "<C-u>zz", default_opts)
+-- map("n", "<C-d>", "<C-d>zz", default_opts)
+
 -- 0 goes to first non-blank character
 -- map("n", "0", "^", { noremap = true })
 -- map("n", "^", "0", { noremap = true })
@@ -119,7 +123,7 @@ map("n", "N", "Nzzzv", default_opts)
 -- any jump over 5 modifies the jumplist
 -- so we can use <C-o> <C-i> to jump back and forth
 for _, c in ipairs({ "j", "k" }) do
-	map("n", c, ([[(v:count > 5 ? "m'" . v:count : "") . '%s']]):format(c), expr_opts)
+   map("n", c, ([[(v:count > 5 ? "m'" . v:count : "") . '%s']]):format(c), expr_opts)
 end
 
 -- -- move along visual lines, not numbered ones
@@ -144,7 +148,7 @@ map("n", "<Esc><Esc>", "<Esc>:nohlsearch<CR>", default_opts)
 map("n", "<leader>/", "<Esc>:nohlsearch<CR>", default_opts)
 
 -- Toggle colored column at 81
-map("n", "<leader>|", ':execute "set colorcolumn=" . (&colorcolumn == "" ? "81" : "")<CR>', default_opts)
+-- map("n", "<leader>|", ':execute "set colorcolumn=" . (&colorcolumn == "" ? "81" : "")<CR>', default_opts)
 
 -- Map <leader>o & <leader>O to newline without insert mode
 map("n", "<leader><CR>", "o<Esc>", default_opts)
@@ -152,10 +156,11 @@ map("n", "<leader><CR>", "o<Esc>", default_opts)
 map("n", "<leader>O", ':<C-u>call append(line(".")-1, repeat([""], v:count1))<CR>', default_opts)
 
 -- Resizing panes
-map("n", "<C-Left>", ":vertical resize +2<CR>", default_opts)
-map("n", "<C-Right>", ":vertical resize -2<CR>", default_opts)
-map("n", "<C-Up>", ":resize -2<CR>", default_opts)
-map("n", "<C-Down>", ":resize +2<CR>", default_opts)
+-- tmux takes over those keymaps
+-- map("n", "<C-Left>", ":vertical resize +2<CR>", default_opts)
+-- map("n", "<C-Right>", ":vertical resize -2<CR>", default_opts)
+-- map("n", "<C-Up>", ":resize -2<CR>", default_opts)
+-- map("n", "<C-Down>", ":resize +2<CR>", default_opts)
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 map("n", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })

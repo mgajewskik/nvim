@@ -74,7 +74,6 @@ return {
       "fredrikaverpil/godoc.nvim",
       version = "*",
       dependencies = {
-         { "folke/snacks.nvim" }, -- optional
          {
             "nvim-treesitter/nvim-treesitter",
             opts = {
@@ -89,7 +88,7 @@ return {
             type = "vsplit",
          },
          picker = {
-            type = "snacks",
+            type = "telescope",
          },
       },
    },
@@ -109,7 +108,10 @@ return {
             lua = { "stylua" },
             -- python = { "isort", "black", "ruff" },
             -- python = { "isort", "ruff_fix", "ruff_format", "ruff_organize_imports" },
-            python = { "isort", "ruff_organize_imports" },
+            -- ruff_format messes with the formatting, works via gf in LSP
+            -- python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
+            python = { "ruff_fix", "ruff_organize_imports" },
+            -- python = { "isort", "ruff_organize_imports" },
             -- go = { "golines", "gofumpt", "goimports" },
             -- go = { "gofumpt", "goimports" },
             go = { "goimports" },

@@ -34,17 +34,17 @@ return {
          },
       },
    },
-   {
-      "tzachar/local-highlight.nvim",
-      event = "VeryLazy",
-      opts = {
-         -- hlgroup = "CursorLine",
-         hlgroup = "TelescopeSelection",
-      },
-      -- config = function()
-      --    require("local-highlight").setup()
-      -- end,
-   },
+   -- {
+   --    "tzachar/local-highlight.nvim",
+   --    event = "VeryLazy",
+   --    opts = {
+   --       -- hlgroup = "CursorLine",
+   --       hlgroup = "TelescopeSelection",
+   --    },
+   --    -- config = function()
+   --    --    require("local-highlight").setup()
+   --    -- end,
+   -- },
    {
       "winston0410/range-highlight.nvim",
       event = "VeryLazy",
