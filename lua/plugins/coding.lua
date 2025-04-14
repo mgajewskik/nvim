@@ -186,9 +186,10 @@ return {
             -- yaml = { "actionlint", "cfn_lint", "yamllint" },
             -- yaml = { "actionlint", "yamllint" },
             yaml = { "yamllint" },
-            go = { "golangcilint" }, -- golangci-lint is not working
+            -- go = { "golangcilint" }, -- golangci-lint is not working
             -- go = { "golangcilint", "revive" }, -- golangci-lint is not working
-            -- go = { "revive" },
+            go = { "revive" },
+            proto = { "protolint" },
             lua = { "luacheck" },
             terraform = { "tfsec" },
             dockerfile = { "hadolint" },
@@ -227,6 +228,7 @@ return {
             "hadolint",
             "jsonlint",
             "sqlfluff",
+            "protolint",
             -- formatters
             "stylua",
             "isort",
@@ -243,6 +245,7 @@ return {
             "shellharden",
             "taplo",
             "djlint",
+            "hyprls",
          },
       },
       config = function(_, opts)

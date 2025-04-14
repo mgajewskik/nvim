@@ -32,7 +32,7 @@ return {
                -- filetypes = { "go", "gomod", "gohtmltmpl", "gotexttmpl" },
                settings = {
                   gopls = {
-                     remote = "auto",
+                     -- remote = "auto",
                      gofumpt = true,
                      analyses = {
                         shadow = true,
@@ -50,6 +50,7 @@ return {
                },
             },
             lua_ls = {
+               -- TODO add indent width 3 spaces
                settings = {
                   Lua = {
                      diagnostics = {
@@ -77,7 +78,11 @@ return {
             marksman = {},
             vimls = {},
             spectral = {},
+            buf_ls = {},
             -- TODO add taplo to this setup
+            hyprls = {
+               filetypes = { "*.hl", "hypr*.conf" },
+            },
          },
          setup = {},
       },
@@ -176,7 +181,7 @@ return {
       version = "*",
       opts = {
          completion = {
-            accept = { auto_brackets = { enabled = true } },
+            accept = { auto_brackets = { enabled = true }, dot_repeat = false },
             list = { selection = { preselect = false, auto_insert = true } },
             documentation = {
                auto_show = true,
@@ -237,9 +242,11 @@ return {
                if cwd == vim.fn.expand("$HOME") or cwd == vim.fn.expand("$HOME/.config") then
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji" }
                   return { "lazydev", "lsp", "path", "buffer", "codecompanion" }
+                  -- return { "lazydev", "lsp", "path", "buffer" }
                else
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji", "ripgrep" }
                   return { "lazydev", "lsp", "path", "buffer", "codecompanion", "ripgrep" }
+                  -- return { "lazydev", "lsp", "path", "buffer", "ripgrep" }
                end
             end,
             providers = {

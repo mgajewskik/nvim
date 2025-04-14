@@ -88,6 +88,16 @@ augroup("Hyprlang", function(g)
    })
 end)
 
+augroup("Proto", function(g)
+   aucmd("FileType", {
+      group = g,
+      pattern = { "proto" },
+      callback = function()
+         vim.opt_local.commentstring = "// %s"
+      end,
+   })
+end)
+
 augroup("Nix", function(g)
    aucmd("FileType", {
       group = g,

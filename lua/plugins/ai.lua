@@ -1,4 +1,139 @@
 return {
+   {
+      -- https://codecompanion.olimorris.dev/
+      "olimorris/codecompanion.nvim",
+      dependencies = {
+         "nvim-lua/plenary.nvim",
+         "nvim-treesitter/nvim-treesitter",
+         -- "ravitemer/mcphub.nvim",
+         { "MeanderingProgrammer/render-markdown.nvim", ft = { "codecompanion" } },
+      },
+      keys = {
+         { "<C-f>", ":CodeCompanionChat Toggle<CR>", { noremap = true, silent = true } },
+         -- { "ga", "<cmd>CodeCompanionChat Add<cr>", { mode = "v", noremap = true, silent = true } },
+      },
+      -- https://github.com/olimorris/codecompanion.nvim/blob/main/lua/codecompanion/config.lua
+      -- https://github.com/oca159/lazyvim/blob/main/lua/plugins/codecompanion.lua
+      opts = {
+         adapters = {
+            anthropic = function()
+               return require("codecompanion.adapters").extend("anthropic", {
+                  schema = {
+                     -- model = {
+                     --    default = "claude-3-7-sonnet-20250219",
+                     -- },
+                     extended_thinking = {
+                        default = false,
+                     },
+                  },
+               })
+            end,
+         },
+         display = {
+            chat = {
+               window = {
+                  -- this is only because it is covering other files when turned on and changin layout of them
+                  layout = "float",
+               },
+               render_headers = false, -- Use RenderMarkdown instead
+            },
+            action_palette = {
+               provider = "fzf_lua",
+            },
+         },
+         -- fzf_lua will work after this is merged: https://github.com/olimorris/codecompanion.nvim/pull/872
+         strategies = {
+            chat = {
+               adapter = "anthropic",
+               slash_commands = {
+                  ["buffer"] = {
+                     opts = {
+                        provider = "fzf_lua",
+                     },
+                  },
+                  ["file"] = {
+                     opts = {
+                        provider = "fzf_lua",
+                     },
+                  },
+                  ["help"] = {
+                     opts = {
+                        provider = "fzf_lua",
+                     },
+                  },
+                  ["symbols"] = {
+                     opts = {
+                        provider = "fzf_lua",
+                     },
+                  },
+               },
+               -- tools = {
+               --    ["mcp"] = {
+               --       -- calling it in a function would prevent mcphub from being loaded before it's needed
+               --       callback = function()
+               --          return require("mcphub.extensions.codecompanion")
+               --       end,
+               --       description = "Call tools and resources from the MCP Servers",
+               --       opts = {
+               --          requires_approval = true,
+               --       },
+               --    },
+               -- },
+            },
+            inline = {
+               adapter = "anthropic",
+            },
+            cmd = {
+               adapter = "anthropic",
+            },
+         },
+      },
+   },
+   -- {
+   -- used on a per project basis
+   --    "augmentcode/augment.vim",
+   --    lazy = false,
+   --    keys = {
+   --       { "<leader>ac", ":Augment chat-toggle<CR>", { noremap = true, silent = true } },
+   --    },
+   --    config = function()
+   --       if vim.fn.system("git rev-parse --is-inside-work-tree"):match("true") then
+   --          vim.g.augment_workspace_folders = { vim.fn.getcwd() }
+   --       end
+   --
+   --       -- local disabled_filetypes = {
+   --       --    "markdown",
+   --       --    "telekasten",
+   --       -- }
+   --
+   --       -- -- NOTE: that works nicely but I wonder how useful that is as the files probaby still get send online
+   --       -- local function should_disable_completions()
+   --       --    return vim.tbl_contains(disabled_filetypes, vim.bo.filetype)
+   --       -- end
+   --       --
+   --       -- local augroup = vim.api.nvim_create_augroup("AugmentDisable", { clear = true })
+   --       --
+   --       -- vim.api.nvim_create_autocmd("BufEnter", {
+   --       --    group = augroup,
+   --       --    pattern = "*",
+   --       --    callback = function()
+   --       --       if should_disable_completions() then
+   --       --          vim.g.augment_disable_completions = true
+   --       --       end
+   --       --    end,
+   --       -- })
+   --       --
+   --       -- vim.api.nvim_create_autocmd("BufLeave", {
+   --       --    group = augroup,
+   --       --    pattern = "*",
+   --       --    callback = function()
+   --       --       if should_disable_completions() then
+   --       --          vim.g.augment_disable_completions = false
+   --       --       end
+   --       --    end,
+   --       -- })
+   --    end,
+   -- },
    -- {
    --    "github/copilot.vim",
    --    event = "VeryLazy",
@@ -22,99 +157,51 @@ return {
    --       vim.api.nvim_set_keymap("i", "<C-L>", "copilot#Next()", { silent = true, expr = true })
    --    end,
    -- },
-   {
-      "supermaven-inc/supermaven-nvim",
-      lazy = false,
-      keys = {
-         { "<leader>cc", ":SupermavenToggle<CR>", { noremap = true, silent = true } },
-      },
-      config = function()
-         require("supermaven-nvim").setup({
-            keymaps = {
-               accept_suggestion = "<Tab>",
-               accept_word = "<C-l>",
-            },
-            ignore_filetypes = { "markdown", "codecompanion" },
-         })
-      end,
-   },
-   {
-      -- https://codecompanion.olimorris.dev/
-      "olimorris/codecompanion.nvim",
-      dependencies = {
-         "nvim-lua/plenary.nvim",
-         "nvim-treesitter/nvim-treesitter",
-         { "MeanderingProgrammer/render-markdown.nvim", ft = { "codecompanion" } },
-      },
-      keys = {
-         { "<C-f>", ":CodeCompanionChat Toggle<CR>", { noremap = true, silent = true } },
-         -- { "ga", "<cmd>CodeCompanionChat Add<cr>", { mode = "v", noremap = true, silent = true } },
-      },
-      -- https://github.com/olimorris/codecompanion.nvim/blob/main/lua/codecompanion/config.lua
-      -- https://github.com/oca159/lazyvim/blob/main/lua/plugins/codecompanion.lua
-      opts = {
-         adapters = {
-            anthropic = function()
-               return require("codecompanion.adapters").extend("anthropic", {
-                  schema = {
-                     model = {
-                        default = "claude-3-7-sonnet-20250219",
-                     },
-                     -- thinking = {
-                     --    type = "disabled",
-                     -- },
-                  },
-               })
-            end,
-         },
-         display = {
-            chat = {
-               window = {
-                  -- this is only because it is covering other files when turned on and changin layout of them
-                  layout = "float",
-               },
-               render_headers = false, -- Use RenderMarkdown instead
-            },
-            action_palette = {
-               provider = "telescope",
-            },
-         },
-         -- fzf_lua will work after this is merged: https://github.com/olimorris/codecompanion.nvim/pull/872
-         strategies = {
-            chat = {
-               adapter = "anthropic",
-               slash_commands = {
-                  ["buffer"] = {
-                     opts = {
-                        provider = "telescope",
-                     },
-                  },
-                  ["file"] = {
-                     opts = {
-                        provider = "telescope",
-                     },
-                  },
-                  ["help"] = {
-                     opts = {
-                        provider = "telescope",
-                     },
-                  },
-                  ["symbols"] = {
-                     opts = {
-                        provider = "telescope",
-                     },
-                  },
-               },
-            },
-            inline = {
-               adapter = "anthropic",
-            },
-            cmd = {
-               adapter = "anthropic",
-            },
-         },
-      },
-   },
+   -- {
+   --    "supermaven-inc/supermaven-nvim",
+   --    lazy = false,
+   --    keys = {
+   --       { "<leader>cc", ":SupermavenToggle<CR>", { noremap = true, silent = true } },
+   --    },
+   --    config = function()
+   --       require("supermaven-nvim").setup({
+   --          keymaps = {
+   --             accept_suggestion = "<Tab>",
+   --             accept_word = "<C-l>",
+   --          },
+   --          ignore_filetypes = { "markdown", "codecompanion" },
+   --       })
+   --    end,
+   -- },
+   -- {
+   --    "ravitemer/mcphub.nvim",
+   --    dependencies = {
+   --       "nvim-lua/plenary.nvim", -- Required for Job and HTTP requests
+   --    },
+   --    -- cmd = "MCPHub", -- lazily start the hub when `MCPHub` is called
+   --    build = "npm install -g mcp-hub@latest", -- Installs required mcp-hub npm module
+   --    config = function()
+   --       require("mcphub").setup({
+   --          -- Required options
+   --          port = 3000, -- Port for MCP Hub server
+   --          config = vim.fn.expand("~/.config/nvim/mcpservers.json"),
+   --
+   --          -- Optional options
+   --          on_ready = function(hub)
+   --             -- Called when hub is ready
+   --          end,
+   --          on_error = function(err)
+   --             -- Called on errors
+   --          end,
+   --          log = {
+   --             level = vim.log.levels.WARN,
+   --             to_file = false,
+   --             file_path = nil,
+   --             prefix = "MCPHub",
+   --          },
+   --       })
+   --    end,
+   -- },
    -- {
    --    "CopilotC-Nvim/CopilotChat.nvim",
    --    branch = "canary",

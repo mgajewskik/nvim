@@ -45,16 +45,17 @@ return {
    --    --    require("local-highlight").setup()
    --    -- end,
    -- },
-   {
-      "winston0410/range-highlight.nvim",
-      event = "VeryLazy",
-      dependencies = {
-         "winston0410/cmd-parser.nvim",
-      },
-      config = function()
-         require("range-highlight").setup()
-      end,
-   },
+   -- {
+   -- throws some red errors, don't want to keep it
+   --    "winston0410/range-highlight.nvim",
+   --    event = "VeryLazy",
+   --    dependencies = {
+   --       "winston0410/cmd-parser.nvim",
+   --    },
+   --    config = function()
+   --       require("range-highlight").setup()
+   --    end,
+   -- },
    -- {
    --    "norcalli/nvim-colorizer.lua",
    --    lazy = true,

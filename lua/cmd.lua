@@ -10,3 +10,5 @@ cmd("Md", "! litemdview %:p & disown", {})
 
 vim.cmd([[cab cc CodeCompanion]])
 vim.cmd([[cab ca CodeCompanionChat Add]])
+
+vim.cmd([[cab ac Augment chat]])
