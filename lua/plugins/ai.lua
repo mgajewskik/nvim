@@ -28,6 +28,15 @@ return {
                   },
                })
             end,
+            gemini = function()
+               return require("codecompanion.adapters").extend("gemini", {
+                  schema = {
+                     model = {
+                        default = "gemini-2.5-pro",
+                     },
+                  },
+               })
+            end,
          },
          display = {
             chat = {
@@ -44,7 +53,8 @@ return {
          -- fzf_lua will work after this is merged: https://github.com/olimorris/codecompanion.nvim/pull/872
          strategies = {
             chat = {
-               adapter = "anthropic",
+               -- adapter = "anthropic",
+               adapter = "gemini",
                slash_commands = {
                   ["buffer"] = {
                      opts = {
@@ -81,10 +91,12 @@ return {
                -- },
             },
             inline = {
-               adapter = "anthropic",
+               -- adapter = "anthropic",
+               adapter = "gemini",
             },
             cmd = {
-               adapter = "anthropic",
+               -- adapter = "anthropic",
+               adapter = "gemini",
             },
          },
       },

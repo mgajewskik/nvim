@@ -83,6 +83,7 @@ return {
             hyprls = {
                filetypes = { "*.hl", "hypr*.conf" },
             },
+            ts_ls = {},
          },
          setup = {},
       },

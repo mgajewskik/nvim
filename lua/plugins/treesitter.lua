@@ -48,15 +48,15 @@ return {
             extended_mode = true, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
             max_file_lines = 2000, -- Do not enable for files with more than specified lines
          },
-         incremental_selection = {
-            enable = true,
-            keymaps = {
-               init_selection = "<CR>",
-               node_incremental = "<CR>",
-               scope_incremental = "<S-CR>",
-               node_decremental = "<BS>",
-            },
-         },
+         -- incremental_selection = {
+         --    enable = true,
+         --    keymaps = {
+         --       init_selection = "<CR>",
+         --       node_incremental = "<CR>",
+         --       scope_incremental = "<S-CR>",
+         --       node_decremental = "<BS>",
+         --    },
+         -- },
          -- should be in editor config but it can't
          textobjects = {
             move = {
