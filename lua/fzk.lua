@@ -28,8 +28,8 @@ function M.setup()
       fzf.files(opts)
    end, map_opts)
    map("n", "<leader>zs", function()
-      -- fzf.live_grep_glob({ cwd = opts.home_dir })
-      fzf.live_grep_glob(opts)
+      -- fzf.live_grep({ cwd = opts.home_dir })
+      fzf.live_grep(opts)
    end, map_opts)
 end
 

@@ -101,6 +101,44 @@ return {
          },
       },
    },
+   {
+      "NickvanDyke/opencode.nvim",
+      dependencies = {
+         "folke/snacks.nvim",
+      },
+      keys = {
+         {
+            "<leader>ot",
+            function()
+               require("opencode").toggle()
+            end,
+            desc = "Toggle embedded opencode",
+         },
+         {
+            "<leader>oa",
+            function()
+               require("opencode").ask()
+            end,
+            desc = "Ask opencode",
+            mode = "n",
+         },
+         {
+            "<leader>oa",
+            function()
+               require("opencode").ask("@selection: ")
+            end,
+            desc = "Ask opencode about selection",
+            mode = "v",
+         },
+         -- {
+         --    "<leader>ot",
+         --    function()
+         --       require("snacks.terminal").toggle("opencode", { win = { position = "right" } })
+         --    end,
+         --    desc = "Toggle opencode",
+         -- },
+      },
+   },
    -- {
    -- used on a per project basis
    --    "augmentcode/augment.vim",

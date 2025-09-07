@@ -1,21 +1,21 @@
 return {
-   {
-      "karb94/neoscroll.nvim",
-      opts = {
-         hide_cursor = false,
-         -- easing = "circular",
-         duration_multiplier = 0.5,
-         mappings = {
-            "<C-u>",
-            "<C-d>",
-            "<C-b>",
-            "<C-y>",
-            "zt",
-            "zz",
-            "zb",
-         },
-      },
-   },
+   -- {
+   --    "karb94/neoscroll.nvim",
+   --    opts = {
+   --       hide_cursor = false,
+   --       -- easing = "circular",
+   --       duration_multiplier = 0.5,
+   --       mappings = {
+   --          "<C-u>",
+   --          "<C-d>",
+   --          "<C-b>",
+   --          "<C-y>",
+   --          "zt",
+   --          "zz",
+   --          "zb",
+   --       },
+   --    },
+   -- },
    {
       "akinsho/toggleterm.nvim",
       lazy = true,
@@ -30,7 +30,7 @@ return {
             border = "rounded",
             -- width = math.floor(vim.o.columns * 0.85),
             -- height = math.floor(vim.o.lines * 0.8),
-            winblend = 15,
+            winblend = 5,
          },
       },
    },

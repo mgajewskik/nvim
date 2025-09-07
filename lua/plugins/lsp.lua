@@ -246,8 +246,8 @@ return {
                   -- return { "lazydev", "lsp", "path", "buffer" }
                else
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji", "ripgrep" }
-                  return { "lazydev", "lsp", "path", "buffer", "codecompanion", "ripgrep" }
-                  -- return { "lazydev", "lsp", "path", "buffer", "ripgrep" }
+                  -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "ripgrep" }
+                  return { "lazydev", "lsp", "path", "buffer", "ripgrep" }
                end
             end,
             providers = {
@@ -260,11 +260,11 @@ return {
                   name = "Ripgrep",
                   opts = {
                      prefix_min_len = 5,
-                     context_size = 5,
-                     max_filesize = "1M",
+                     -- context_size = 5,
+                     -- max_filesize = "1M",
                      project_root_marker = { ".git", "go.mod" },
-                     search_casing = "--smart-case",
-                     additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
+                     -- search_casing = "--smart-case",
+                     -- additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
                      fallback_to_regex_highlighting = true,
                   },
                },
@@ -280,6 +280,14 @@ return {
                   score_offset = 15, -- Tune by preference
                   opts = { insert = true }, -- Insert emoji (default) or complete its name
                },
+            },
+         },
+         backend = {
+            context_size = 5,
+            ripgrep = {
+               additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
+               max_filesize = "1M",
+               search_casing = "--smart-case",
             },
          },
       },

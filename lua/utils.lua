@@ -17,7 +17,7 @@ function M.home_fzf(cmd)
          vim.cmd("cd " .. "$HOME/" .. selected[1])
       end,
       ["ctrl-s"] = function(selected)
-         fzf_lua.live_grep_glob({ cwd = vim.fn.expand("$HOME/" .. selected[1]) })
+         fzf_lua.live_grep({ cwd = vim.fn.expand("$HOME/" .. selected[1]) })
       end,
    }
    -- fzf_lua.fzf_exec("fd --type d -H -i -L -E 'venv' -E '.venv' -E '.git'", opts)

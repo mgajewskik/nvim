@@ -113,6 +113,7 @@ return {
          -- "junegunn/fzf",
          -- "vijaymarupudi/nvim-fzf",
          "kyazdani42/nvim-web-devicons",
+         -- "elanmed/fzf-lua-frecency.nvim",
       },
       lazy = false,
       keys = {
@@ -126,7 +127,7 @@ return {
          { "<leader>`", ":FzfLua buffers<CR>", { noremap = true } },
          { "<leader><leader>", ":FzfLua buffers<CR>", { noremap = true } },
          { "<leader>\\\\", ":FzfLua grep_visual<CR>", { noremap = true } },
-         { "\\\\", ":FzfLua live_grep_glob<CR>", { noremap = true } },
+         { "\\\\", ":FzfLua live_grep<CR>", { noremap = true } },
          { "//", ":FzfLua blines<CR>", { noremap = true } },
          { "<leader>sq", ":FzfLua quickfix<CR>", { noremap = true } },
          { "gr", ":FzfLua lsp_references<CR>", { noremap = true } },
@@ -214,6 +215,10 @@ return {
       config = function(_, opts)
          require("fzf-lua").setup("fzf-native")
          require("fzf-lua").setup(opts)
+         -- require("fzf-lua-frecency").setup({
+         --    cwd_only = true,
+         --    display_score = true,
+         -- })
 
          local map = vim.keymap.set
          -- doesn't work with keya mapping

@@ -146,7 +146,7 @@ return {
          -- require("conform.formatters.jq").args = { "--indent", "4" }
          local jq = require("conform.formatters.jq")
          require("conform").formatters.jq = vim.tbl_deep_extend("force", jq, {
-            args = util.extend_args(jq.args, { "--indent", "4" }),
+            args = util.extend_args(jq.args, { "--indent", "2" }),
          })
 
          local stylua = require("conform.formatters.stylua")

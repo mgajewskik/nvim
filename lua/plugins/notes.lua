@@ -137,4 +137,69 @@ return {
          })
       end,
    },
+   -- {
+   --    "epwalsh/obsidian.nvim",
+   --    version = "*", -- recommended, use latest release instead of latest commit
+   --    lazy = false,
+   --    ft = "markdown",
+   --    dependencies = {
+   --       "nvim-lua/plenary.nvim",
+   --    },
+   --    keys = {
+   --       { "<leader>zf", "<CMD>ObsidianQuickSwitch<CR>", { noremap = true } },
+   --       { "<leader>zs", "<CMD>ObsidianSearch<CR>", { noremap = true } },
+   --       { "<leader>zd", "<CMD>Telekasten find_daily_notes<CR>", { noremap = true } },
+   --       { "<leader>zw", "<CMD>Telekasten find_weekly_notes<CR>", { noremap = true } },
+   --       { "<leader>zg", "<CMD>Telekasten find_friends<CR>", { noremap = true } },
+   --       { "<leader>zt", "<CMD>Telekasten show_tags<CR>", { noremap = true } },
+   --       { "<leader>zb", "<CMD>Telekasten show_backlinks<CR>", { noremap = true } },
+   --       { "<leader>zc", "<CMD>Telekasten show_calendar<CR>", { noremap = true } },
+   --       { "<leader>znn", "<CMD>Telekasten new_note<CR>", { noremap = true } },
+   --       { "<leader>znd", "<CMD>Telekasten goto_today<CR>", { noremap = true } },
+   --       { "<leader>znw", "<CMD>Telekasten goto_thisweek<CR>", { noremap = true } },
+   --       { "<leader>zz", "<CMD>Telekasten follow_link<CR>", { noremap = true } },
+   --       { "<leader>zl", "<CMD>Telekasten insert_link<CR>", { noremap = true } },
+   --       { "<leader>zy", "<CMD>Telekasten yank_notelink<CR>", { noremap = true } },
+   --       { "<leader>zm", "<CMD>Telekasten browse_media<CR>", { noremap = true } },
+   --       { "<leader>zi", "<CMD>Telekasten preview_img<CR>", { noremap = true } },
+   --       { "<leader>za", "<CMD>Telekasten toggle_todo<CR>", { noremap = true } },
+   --       { "<leader>zr", "<CMD>Telekasten rename_note<CR>", { noremap = true } },
+   --       { "<leader>z?", "<CMD>Telekasten panel<CR>", { noremap = true } },
+   --    },
+   --    opts = {
+   --       disable_frontmatter = true,
+   --       workspaces = {
+   --          {
+   --             name = "notes",
+   --             path = "~/dropbox/obsidian",
+   --          },
+   --       },
+   --       picker = {
+   --          name = "fzf-lua",
+   --       },
+   --       daily_notes = {
+   --          folder = "journal/daily",
+   --          date_format = "%Y-%m-%d",
+   --          -- Optional, if you want to change the date format of the default alias of daily notes.
+   --          -- alias_format = "%B %-d, %Y",
+   --          -- Optional, default tags to add to each new daily note created.
+   --          default_tags = { "daily" },
+   --          -- Optional, if you want to automatically insert a template from your template directory like 'daily.md'
+   --          template = "daily.md",
+   --       },
+   --       templates = {
+   --          folder = "templates",
+   --          date_format = "%Y-%m-%d",
+   --          time_format = "%H:%M",
+   --          -- A map for custom variables, the key should be the variable and the value a function
+   --          substitutions = {},
+   --       },
+   --       attachments = {
+   --          img_folder = "media",
+   --       },
+   --       ui = {
+   --          enable = true,
+   --       },
+   --    },
+   -- },
 }
