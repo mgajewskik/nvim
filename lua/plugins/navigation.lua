@@ -3,7 +3,8 @@ return {
       "ggandor/leap.nvim",
       event = "VeryLazy",
       config = function()
-         require("leap").add_default_mappings()
+         vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)")
+         vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
       end,
    },
    {
