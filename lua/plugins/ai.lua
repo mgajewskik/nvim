@@ -103,17 +103,7 @@ return {
    },
    {
       "NickvanDyke/opencode.nvim",
-      dependencies = {
-         "folke/snacks.nvim",
-      },
       keys = {
-         {
-            "<leader>ot",
-            function()
-               require("opencode").toggle()
-            end,
-            desc = "Toggle embedded opencode",
-         },
          {
             "<leader>oa",
             function()
@@ -125,18 +115,11 @@ return {
          {
             "<leader>oa",
             function()
-               require("opencode").ask("@selection: ")
+               require("opencode").ask("@this: ", { submit = true })
             end,
-            desc = "Ask opencode about selection",
+            desc = "Ask opencode about this",
             mode = "v",
          },
-         -- {
-         --    "<leader>ot",
-         --    function()
-         --       require("snacks.terminal").toggle("opencode", { win = { position = "right" } })
-         --    end,
-         --    desc = "Toggle opencode",
-         -- },
       },
    },
    -- {
