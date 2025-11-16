@@ -3,7 +3,7 @@ return {
       "neovim/nvim-lspconfig",
       dependencies = {
          "mason.nvim",
-         "williamboman/mason-lspconfig.nvim",
+         { "mason-org/mason-lspconfig.nvim", config = function() end },
          -- "hrsh7th/cmp-nvim-lsp",
          "saghen/blink.cmp",
       },
@@ -43,12 +43,10 @@ return {
                      formatting = {
                         gofumpt = true,
                      },
-                     telemetry = {
-                        enable = false,
-                     },
                   },
                },
             },
+            stylua = { enabled = false },
             lua_ls = {
                -- TODO add indent width 3 spaces
                settings = {
@@ -88,69 +86,65 @@ return {
          setup = {},
       },
       config = function(_, opts)
-         -- require("utils").on_attach(function(client, buffer)
-         --    -- require("utils").format_on_attach(client, buffer)
-         --    require("utils").keymaps_on_attach(client, buffer)
-         -- end)
          require("utils").lsp_on_attach()
 
          -- diagnostics
-         -- https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization#customizing-how-diagnostics-are-displayed
-         for name, icon in pairs(require("icons").icons.diagnostics) do
-            name = "DiagnosticSign" .. name
-            vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
+         if type(opts.diagnostics.virtual_text) == "table" and opts.diagnostics.virtual_text.prefix == "icons" then
+            opts.diagnostics.virtual_text.prefix = function(diagnostic)
+               local icons = require("icons").icons.diagnostics
+               for d, icon in pairs(icons) do
+                  if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
+                     return icon
+                  end
+               end
+               return "●"
+            end
          end
-         vim.diagnostic.config(opts.diagnostics)
+         vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-         -- local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
          local capabilities = require("blink.cmp").get_lsp_capabilities(vim.lsp.protocol.make_client_capabilities())
          capabilities.textDocument.foldingRange = {
             dynamicRegistration = false,
             lineFoldingOnly = true,
          }
 
-         local servers = opts.servers
+         if opts.servers["*"] then
+            vim.lsp.config("*", opts.servers["*"])
+         end
 
-         local function setup(server)
-            local server_opts = vim.tbl_deep_extend("force", {
-               capabilities = vim.deepcopy(capabilities),
-            }, servers[server] or {})
+         local mason_all = vim.tbl_keys(require("mason-lspconfig.mappings").get_mason_map().lspconfig_to_package) or {}
+         local mason_exclude = {} ---@type string[]
 
-            if opts.setup[server] then
-               if opts.setup[server](server, server_opts) then
-                  return
-               end
-            elseif opts.setup["*"] then
-               if opts.setup["*"](server, server_opts) then
-                  return
+         local function configure(server)
+            if server == "*" then
+               return false
+            end
+            local sopts = opts.servers[server]
+            sopts = sopts == true and {} or (not sopts) and { enabled = false } or sopts
+
+            if sopts.enabled == false then
+               mason_exclude[#mason_exclude + 1] = server
+               return
+            end
+
+            local use_mason = sopts.mason ~= false and vim.tbl_contains(mason_all, server)
+            local setup = opts.setup[server] or opts.setup["*"]
+            if setup and setup(server, sopts) then
+               mason_exclude[#mason_exclude + 1] = server
+            else
+               vim.lsp.config(server, sopts) -- configure the server
+               if not use_mason then
+                  vim.lsp.enable(server)
                end
             end
-            require("lspconfig")[server].setup(server_opts)
+            return use_mason
          end
 
-         -- get all the servers that are available thourgh mason-lspconfig
-         local have_mason, mlsp = pcall(require, "mason-lspconfig")
-         local all_mslp_servers = {}
-         if have_mason then
-            all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
-         end
-
-         local ensure_installed = {} ---@type string[]
-         for server, server_opts in pairs(servers) do
-            if server_opts then
-               server_opts = server_opts == true and {} or server_opts
-               -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-               if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
-                  setup(server)
-               else
-                  ensure_installed[#ensure_installed + 1] = server
-               end
-            end
-         end
-
-         if have_mason then
-            mlsp.setup({ ensure_installed = ensure_installed, handlers = { setup } })
-         end
+         local install = vim.tbl_filter(configure, vim.tbl_keys(opts.servers))
+         require("mason-lspconfig").setup({
+            ensure_installed = install,
+            automatic_enable = { exclude = mason_exclude },
+         })
       end,
    },
    {
