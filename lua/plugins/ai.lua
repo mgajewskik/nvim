@@ -1,106 +1,106 @@
 return {
-   {
-      -- https://codecompanion.olimorris.dev/
-      "olimorris/codecompanion.nvim",
-      dependencies = {
-         "nvim-lua/plenary.nvim",
-         "nvim-treesitter/nvim-treesitter",
-         -- "ravitemer/mcphub.nvim",
-         { "MeanderingProgrammer/render-markdown.nvim", ft = { "codecompanion" } },
-      },
-      keys = {
-         { "<C-f>", ":CodeCompanionChat Toggle<CR>", { noremap = true, silent = true } },
-         -- { "ga", "<cmd>CodeCompanionChat Add<cr>", { mode = "v", noremap = true, silent = true } },
-      },
-      -- https://github.com/olimorris/codecompanion.nvim/blob/main/lua/codecompanion/config.lua
-      -- https://github.com/oca159/lazyvim/blob/main/lua/plugins/codecompanion.lua
-      opts = {
-         adapters = {
-            anthropic = function()
-               return require("codecompanion.adapters").extend("anthropic", {
-                  schema = {
-                     -- model = {
-                     --    default = "claude-3-7-sonnet-20250219",
-                     -- },
-                     extended_thinking = {
-                        default = false,
-                     },
-                  },
-               })
-            end,
-            gemini = function()
-               return require("codecompanion.adapters").extend("gemini", {
-                  schema = {
-                     model = {
-                        default = "gemini-2.5-pro",
-                     },
-                  },
-               })
-            end,
-         },
-         display = {
-            chat = {
-               window = {
-                  -- this is only because it is covering other files when turned on and changin layout of them
-                  layout = "float",
-               },
-               render_headers = false, -- Use RenderMarkdown instead
-            },
-            action_palette = {
-               provider = "fzf_lua",
-            },
-         },
-         -- fzf_lua will work after this is merged: https://github.com/olimorris/codecompanion.nvim/pull/872
-         strategies = {
-            chat = {
-               -- adapter = "anthropic",
-               adapter = "gemini",
-               slash_commands = {
-                  ["buffer"] = {
-                     opts = {
-                        provider = "fzf_lua",
-                     },
-                  },
-                  ["file"] = {
-                     opts = {
-                        provider = "fzf_lua",
-                     },
-                  },
-                  ["help"] = {
-                     opts = {
-                        provider = "fzf_lua",
-                     },
-                  },
-                  ["symbols"] = {
-                     opts = {
-                        provider = "fzf_lua",
-                     },
-                  },
-               },
-               -- tools = {
-               --    ["mcp"] = {
-               --       -- calling it in a function would prevent mcphub from being loaded before it's needed
-               --       callback = function()
-               --          return require("mcphub.extensions.codecompanion")
-               --       end,
-               --       description = "Call tools and resources from the MCP Servers",
-               --       opts = {
-               --          requires_approval = true,
-               --       },
-               --    },
-               -- },
-            },
-            inline = {
-               -- adapter = "anthropic",
-               adapter = "gemini",
-            },
-            cmd = {
-               -- adapter = "anthropic",
-               adapter = "gemini",
-            },
-         },
-      },
-   },
+   -- {
+   --    -- https://codecompanion.olimorris.dev/
+   --    "olimorris/codecompanion.nvim",
+   --    dependencies = {
+   --       "nvim-lua/plenary.nvim",
+   --       "nvim-treesitter/nvim-treesitter",
+   --       -- "ravitemer/mcphub.nvim",
+   --       { "MeanderingProgrammer/render-markdown.nvim", ft = { "codecompanion" } },
+   --    },
+   --    keys = {
+   --       { "<C-f>", ":CodeCompanionChat Toggle<CR>", { noremap = true, silent = true } },
+   --       -- { "ga", "<cmd>CodeCompanionChat Add<cr>", { mode = "v", noremap = true, silent = true } },
+   --    },
+   --    -- https://github.com/olimorris/codecompanion.nvim/blob/main/lua/codecompanion/config.lua
+   --    -- https://github.com/oca159/lazyvim/blob/main/lua/plugins/codecompanion.lua
+   --    opts = {
+   --       adapters = {
+   --          anthropic = function()
+   --             return require("codecompanion.adapters").extend("anthropic", {
+   --                schema = {
+   --                   -- model = {
+   --                   --    default = "claude-3-7-sonnet-20250219",
+   --                   -- },
+   --                   extended_thinking = {
+   --                      default = false,
+   --                   },
+   --                },
+   --             })
+   --          end,
+   --          gemini = function()
+   --             return require("codecompanion.adapters").extend("gemini", {
+   --                schema = {
+   --                   model = {
+   --                      default = "gemini-2.5-pro",
+   --                   },
+   --                },
+   --             })
+   --          end,
+   --       },
+   --       display = {
+   --          chat = {
+   --             window = {
+   --                -- this is only because it is covering other files when turned on and changin layout of them
+   --                layout = "float",
+   --             },
+   --             render_headers = false, -- Use RenderMarkdown instead
+   --          },
+   --          action_palette = {
+   --             provider = "fzf_lua",
+   --          },
+   --       },
+   --       -- fzf_lua will work after this is merged: https://github.com/olimorris/codecompanion.nvim/pull/872
+   --       strategies = {
+   --          chat = {
+   --             -- adapter = "anthropic",
+   --             adapter = "gemini",
+   --             slash_commands = {
+   --                ["buffer"] = {
+   --                   opts = {
+   --                      provider = "fzf_lua",
+   --                   },
+   --                },
+   --                ["file"] = {
+   --                   opts = {
+   --                      provider = "fzf_lua",
+   --                   },
+   --                },
+   --                ["help"] = {
+   --                   opts = {
+   --                      provider = "fzf_lua",
+   --                   },
+   --                },
+   --                ["symbols"] = {
+   --                   opts = {
+   --                      provider = "fzf_lua",
+   --                   },
+   --                },
+   --             },
+   --             -- tools = {
+   --             --    ["mcp"] = {
+   --             --       -- calling it in a function would prevent mcphub from being loaded before it's needed
+   --             --       callback = function()
+   --             --          return require("mcphub.extensions.codecompanion")
+   --             --       end,
+   --             --       description = "Call tools and resources from the MCP Servers",
+   --             --       opts = {
+   --             --          requires_approval = true,
+   --             --       },
+   --             --    },
+   --             -- },
+   --          },
+   --          inline = {
+   --             -- adapter = "anthropic",
+   --             adapter = "gemini",
+   --          },
+   --          cmd = {
+   --             -- adapter = "anthropic",
+   --             adapter = "gemini",
+   --          },
+   --       },
+   --    },
+   -- },
    {
       "NickvanDyke/opencode.nvim",
       keys = {
