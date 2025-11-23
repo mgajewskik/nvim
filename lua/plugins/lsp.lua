@@ -171,6 +171,7 @@ return {
          "mikavilpas/blink-ripgrep.nvim",
          "folke/lazydev.nvim",
          "moyiz/blink-emoji.nvim",
+         { "saghen/blink.compat", lazy = true, version = false },
       },
       version = "*",
       opts = {
@@ -235,19 +236,15 @@ return {
                local cwd = vim.fn.getcwd()
                if cwd == vim.fn.expand("$HOME") or cwd == vim.fn.expand("$HOME/.config") then
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji" }
-                  return { "lazydev", "lsp", "path", "buffer", "codecompanion" }
+                  return { "obsidian", "obsidian_new", "obsidian_tags", "lazydev", "lsp", "path", "buffer" }
                   -- return { "lazydev", "lsp", "path", "buffer" }
                else
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji", "ripgrep" }
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "ripgrep" }
-                  return { "lazydev", "lsp", "path", "buffer", "ripgrep" }
+                  return { "obsidian", "obsidian_new", "obsidian_tags", "lazydev", "lsp", "path", "buffer", "ripgrep" }
                end
             end,
             providers = {
-               codecompanion = {
-                  name = "CodeCompanion",
-                  module = "codecompanion.providers.completion.blink",
-               },
                ripgrep = {
                   module = "blink-ripgrep",
                   name = "Ripgrep",

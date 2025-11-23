@@ -5,7 +5,7 @@ vim.g.maplocalleader = " "
 
 o.clipboard = "unnamedplus" -- Sync with system clipboard
 o.completeopt = "menu,menuone,noselect"
-o.conceallevel = 0 -- Hide * markup for bold and italic
+o.conceallevel = 2 -- Hide * markup for bold and italic
 o.confirm = true -- Confirm to save changes before exiting modified buffer
 o.cursorline = true -- Enable highlighting of the current line
 o.expandtab = true -- Use spaces instead of tabs
@@ -29,6 +29,7 @@ o.sidescrolloff = 8 -- Columns of context
 o.signcolumn = "yes" -- Always show the signcolumn, otherwise it would shift the text each time
 o.smartcase = true -- Don't ignore case with capitals
 o.smartindent = true -- Insert indents automatically
+o.autoindent = true
 o.spelllang = { "en" }
 o.splitbelow = true -- Put new windows below current
 o.splitright = true -- Put new windows right of current
@@ -242,9 +243,9 @@ vim.g.markdown_recommended_style = 0
 -- o.wrapscan = true -- begin search from top of the file when nothing is found
 -- vim.o.cpoptions = vim.o.cpoptions .. "x" -- stay on search item when <esc>
 --
--- o.backup = false -- no backup file
--- o.writebackup = false -- do not backup file before write
--- o.swapfile = false -- no swap file
+o.backup = false -- no backup file
+o.writebackup = false -- do not backup file before write
+o.swapfile = false -- no swap file
 --
 -- --[[
 --   ShDa (viminfo for vim): session data history
