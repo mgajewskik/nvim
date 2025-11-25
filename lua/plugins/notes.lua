@@ -147,7 +147,7 @@ return {
       },
       keys = {
          { "<leader>zs", "<CMD>Obsidian search<CR>", { noremap = true } },
-         { "<leader>zf", "<CMD>Obsidian qyick_switch<CR>", { noremap = true } },
+         { "<leader>zf", "<CMD>Obsidian quick_switch<CR>", { noremap = true } },
          { "<leader>zl", "<CMD>Obsidian links<CR>", { noremap = true } },
          { "<leader>zh", "<CMD>Obsidian backlinks<CR>", { noremap = true } },
          { "<leader>zd", "<CMD>Obsidian dailies -2 1<CR>", { noremap = true } },
@@ -220,15 +220,40 @@ return {
          frontmatter = {
             enabled = true,
             func = function(note)
-               -- note.id is the full "202511191045 - My Title"
+               -- Preserve existing aliases (from parsed frontmatter) and add title only if missing
+               local aliases = note.aliases or {}
+               if note.title and not vim.tbl_contains(aliases, note.title) then
+                  table.insert(aliases, note.title)
+               end
+
+               -- Preserve existing tags
+               local tags = note.tags or {}
+
+               -- Add "daily" tag only for notes in daily folder (merge, no dups)
+               local full_path = vim.fn.expand("%:p")
+               local dir = full_path ~= "" and vim.fn.fnamemodify(full_path, ":h") or ""
+               if dir ~= "" and string.find(dir:lower(), "daily") then
+                  if not vim.tbl_contains(tags, "daily") then
+                     table.insert(tags, "daily")
+                  end
+               end
+
+               -- Add "inbox" tag for notes whose ID ends with "-inbox"
+               if note.id and note.id:match("%-inbox$") then
+                  if not vim.tbl_contains(tags, "inbox") then
+                     table.insert(tags, "inbox")
+                  end
+               end
+
+               -- Add "untagged" only if still empty and has title (for normal notes)
+               if #tags == 0 and note.title then
+                  table.insert(tags, "untagged")
+               end
+
                return {
-                  -- id = note.id:gsub('"', ""),
                   id = note.id,
-                  -- TODO: change to title or completely empty
-                  -- title = note.title or "",
-                  -- created = os.date("%Y-%m-%d"),
-                  tags = {},
-                  aliases = note.title and { note.title } or {},
+                  aliases = aliases,
+                  tags = tags,
                }
             end,
          },
