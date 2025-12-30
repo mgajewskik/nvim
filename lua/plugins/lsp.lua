@@ -59,7 +59,8 @@ return {
                   },
                },
             },
-            pyright = {},
+            pyright = { enabled = false },
+            ty = {},
             ruff = {
                -- https://pypi.org/project/ruff/0.0.47/
                init_options = {
