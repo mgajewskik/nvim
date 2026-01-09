@@ -152,9 +152,38 @@ return {
          { "<leader>zh", "<CMD>Obsidian backlinks<CR>", { noremap = true } },
          { "<leader>zd", "<CMD>Obsidian dailies -2 1<CR>", { noremap = true } },
          { "<leader>znd", "<CMD>Obsidian today<CR>", { noremap = true } },
-         { "<leader>znn", ":Obsidian new ", { noremap = true } },
+         {
+            "<leader>znn",
+            function()
+               local title = vim.fn.input("Note title: ")
+               vim.cmd("Obsidian new_from_template " .. title .. " zettelkasten")
+            end,
+            { noremap = true, desc = "New note from zettelkasten template" },
+         },
+         {
+            "<leader>znh",
+            function()
+               local vault = vim.fn.expand("$NOTES_PATH")
+               local buf_path = vim.fn.expand("%:p:h")
+
+               if not buf_path:find(vault, 1, true) then
+                  vim.notify("Not in obsidian vault", vim.log.levels.ERROR)
+                  return
+               end
+
+               local rel_path = buf_path:sub(#vault + 2) .. "/"
+               if rel_path == "/" then rel_path = "" end
+
+               vim.ui.input({ prompt = "Note title: ", default = rel_path }, function(input)
+                  if input and input ~= "" then
+                     vim.cmd("Obsidian new_from_template " .. input .. " zettelkasten")
+                  end
+               end)
+            end,
+            desc = "New zettelkasten note here",
+         },
          { "<leader>znt", "<CMD>Obsidian new_from_template<CR>", { noremap = true } },
-         { "<leader>zz", "<CMD>Obsidian follow_link<CR>", { noremap = true } },
+         { "<leader>zz", "<CMD>Obsidian follow_link vsplit<CR>", { noremap = true } },
          { "<leader>zt", "<CMD>Obsidian tags<CR>", { noremap = true } },
          { "<leader>zr", "<CMD>Obsidian rename<CR>", { noremap = true } },
          { "<leader>za", "<CMD>Obsidian toggle_checkbox<CR>", { noremap = true } },
@@ -181,16 +210,16 @@ return {
          search = {
             sort_by = "modified",
             sort_reversed = true,
-            max_lines = 1000,
+            max_lines = 3000,
          },
          completion = {
             -- nvim_cmp = false,
             blink = true,
-            min_chars = 1,
+            min_chars = 2,
          },
          new_notes_location = "notes_dir",
          daily_notes = {
-            folder = "areas/journal/daily",
+            folder = vim.fn.expand("$NOTES_DAILY_PATH"),
             date_format = "%Y-%m-%d",
             -- Optional, if you want to change the date format of the default alias of daily notes.
             -- alias_format = "%B %-d, %Y",
@@ -203,8 +232,23 @@ return {
             folder = "templates",
             date_format = "%Y-%m-%d",
             time_format = "%H:%M",
-            -- A map for custom variables, the key should be the variable and the value a function
-            substitutions = {},
+         substitutions = {
+            alias = function(ctx)
+               if ctx.partial_note and ctx.partial_note.id then
+                  local id = ctx.partial_note.id
+                  -- Zettelkasten format: YYYYMMDDHHMM-title
+                  local extracted = id:match("^%d+%-(.+)$")
+                  if extracted then
+                     return extracted
+                  end
+                  -- Periodic notes: return ID as-is (2026-Q1, 2026-W01, etc.)
+                  if id:match("^%d%d%d%d%-") or id:match("^%d%d%d%d$") then
+                     return id
+                  end
+               end
+               return ""
+            end,
+         },
          },
          attachments = {
             img_folder = "media",
@@ -219,11 +263,34 @@ return {
          },
          frontmatter = {
             enabled = true,
+            sort = { "id", "aliases", "tags" },
             func = function(note)
-               -- Preserve existing aliases (from parsed frontmatter) and add title only if missing
+               -- Preserve existing aliases and add title/filename as alias
                local aliases = note.aliases or {}
-               if note.title and not vim.tbl_contains(aliases, note.title) then
-                  table.insert(aliases, note.title)
+               local alias_to_add = note.title
+
+               -- Fallback: extract from ID if title is nil
+               if (not alias_to_add or alias_to_add == "") and note.id then
+                  local id = note.id
+                  -- Periodic notes: use ID as-is
+                  if id:match("^%d%d%d%d%-%d%d%-%d%d$") -- Daily
+                     or id:match("^%d%d%d%d%-Q%d$") -- Quarterly
+                     or id:match("^%d%d%d%d%-W%d%d$") -- Weekly
+                     or id:match("^%d%d%d%d%-%d%d$") -- Monthly
+                     or id:match("^%d%d%d%d$") -- Yearly
+                  then
+                     alias_to_add = id
+                  else
+                     -- Zettelkasten: extract from YYYYMMDDHHMM-title (12 digits)
+                     local extracted = id:match("^%d%d%d%d%d%d%d%d%d%d%d%d%-(.+)$")
+                     if extracted and extracted ~= "inbox" then
+                        alias_to_add = extracted
+                     end
+                  end
+               end
+
+               if alias_to_add and alias_to_add ~= "" and not vim.tbl_contains(aliases, alias_to_add) then
+                  table.insert(aliases, alias_to_add)
                end
 
                -- Preserve existing tags
@@ -250,24 +317,42 @@ return {
                   table.insert(tags, "untagged")
                end
 
-               return {
+               -- Build the base frontmatter
+               local out = {
                   id = note.id,
                   aliases = aliases,
                   tags = tags,
                }
+
+               -- Merge in any additional custom metadata
+               if note.metadata and not vim.tbl_isempty(note.metadata) then
+                  for k, v in pairs(note.metadata) do
+                     if out[k] == nil then
+                        out[k] = v
+                     end
+                  end
+               end
+
+               return out
             end,
          },
          note_id_func = function(title)
-            local timestamp = os.date("%Y%m%d%H%M")
-            -- TODO: test and add handling for paths that are prepended to the note name
-            if title and title ~= "" then
-               -- optional: sanitize only the most dangerous filename chars
-               -- suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
-               local safe_title = title:gsub("[/\\:]", "-")
-               return string.format("%s-%s", timestamp, safe_title:gsub(" ", "-"):lower())
-            else
-               return timestamp .. "-inbox"
+            if not title or title == "" then
+               return os.date("%Y%m%d%H%M") .. "-inbox"
             end
+            -- Periodic note patterns - pass through as-is
+            if title:match("^%d%d%d%d%-%d%d%-%d%d$") -- Daily: 2024-12-30
+               or title:match("^%d%d%d%d%-Q%d$") -- Quarterly: 2026-Q1
+               or title:match("^%d%d%d%d%-W%d%d$") -- Weekly: 2026-W01
+               or title:match("^%d%d%d%d%-%d%d$") -- Monthly: 2026-01
+               or title:match("^%d%d%d%d$") -- Yearly: 2026
+            then
+               return title
+            end
+            -- Regular zettelkasten
+            local timestamp = os.date("%Y%m%d%H%M")
+            local safe_title = title:gsub("[/\\:]", "-")
+            return string.format("%s-%s", timestamp, safe_title:gsub(" ", "-"):lower())
          end,
          wiki_link_func = function(opts)
             if opts.label then

@@ -75,7 +75,7 @@ return {
             tflint = {},
             marksman = {},
             vimls = {},
-            spectral = {},
+            -- spectral = {},
             buf_ls = {},
             -- TODO add taplo to this setup
             hyprls = {

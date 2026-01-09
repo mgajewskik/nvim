@@ -222,7 +222,7 @@ return {
             "actionlint",
             "cfn-lint",
             "yamllint",
-            "golangci-lint",
+            -- "golangci-lint",
             "revive",
             "luacheck",
             "tfsec",
