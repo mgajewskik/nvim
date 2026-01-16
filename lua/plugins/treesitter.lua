@@ -1,95 +1,19 @@
 return {
    {
-      "tree-sitter-grammars/tree-sitter-hyprlang",
-      dependencies = { "nvim-treesitter/nvim-treesitter" },
-      config = function(_, opts)
-         -- https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#adding-parsers
-         local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-         parser_config.hyprlang = {
-            install_info = {
-               url = "~/.local/share/nvim/lazy/tree-sitter-hyprlang", -- local path or git repo
-               files = { "src/parser.c" }, -- note that some parsers also require src/scanner.c or src/scanner.cc
-               -- optional entries:
-               branch = "main", -- default branch in case of git repo if different from master
-               generate_requires_npm = false, -- if stand-alone parser without npm dependencies
-               requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
-            },
-            filetype = "hyprlang", -- if filetype does not match the parser name
-         }
-
-         vim.filetype.add({
-            pattern = { [".*/hypr/.*%.conf"] = "hyprlang" },
-         })
-         vim.treesitter.language.register("hyprlang", "hyprlang")
-      end,
-   },
-   {
       "nvim-treesitter/nvim-treesitter",
-      dependencies = {
-         "nvim-treesitter/nvim-treesitter-textobjects",
-         "RRethy/nvim-treesitter-endwise",
-      },
+      branch = "main",
       version = false,
-      build = ":TSUpdate",
-      event = { "BufReadPost", "BufNewFile" },
+      lazy = false,
+      build = function()
+         local ok, ts = pcall(require, "nvim-treesitter")
+         if ok and ts.update then
+            ts.update()
+         end
+      end,
       opts = {
-         highlight = {
-            enable = true, -- false will disable the whole extension
-            -- disable = { "vim" }, -- list of language that will be disabled
-            additional_vim_regex_highlighting = { "markdown" },
-         },
-         endwise = {
-            enable = true,
-         },
+         highlight = { enable = true },
          indent = { enable = true },
-         autopairs = { enable = true },
-         rainbow = {
-            enable = true,
-            extended_mode = true, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
-            max_file_lines = 2000, -- Do not enable for files with more than specified lines
-         },
-         -- incremental_selection = {
-         --    enable = true,
-         --    keymaps = {
-         --       init_selection = "<CR>",
-         --       node_incremental = "<CR>",
-         --       scope_incremental = "<S-CR>",
-         --       node_decremental = "<BS>",
-         --    },
-         -- },
-         -- should be in editor config but it can't
-         textobjects = {
-            move = {
-               enable = true,
-               set_jumps = true,
-               goto_next_start = {
-                  ["]]"] = "@function.outer",
-                  ["]m"] = "@class.outer",
-               },
-               goto_previous_start = {
-                  ["[[]"] = "@function.outer",
-                  ["[m"] = "@class.outer",
-               },
-            },
-            select = {
-               enable = true,
-               -- Automatically jump forward to textobj, similar to targets.vim
-               lookahead = true,
-               keymaps = {
-                  -- You can use the capture groups defined in textobjects.scm
-                  ["af"] = "@function.outer",
-                  ["if"] = "@function.inner",
-                  ["ac"] = "@class.outer",
-                  ["ic"] = "@class.inner",
-                  ["al"] = "@loop.outer",
-                  ["il"] = "@loop.inner",
-                  ["ib"] = "@block.inner",
-                  ["ab"] = "@block.outer",
-                  ["ir"] = "@parameter.inner",
-                  ["ar"] = "@parameter.outer",
-               },
-            },
-         },
+         folds = { enable = false },
          ensure_installed = {
             "bash",
             "css",
@@ -108,7 +32,6 @@ return {
             "javascript",
             "typescript",
             "json",
-            "latex",
             "lua",
             "markdown",
             "markdown_inline",
@@ -123,19 +46,129 @@ return {
             "regex",
             "sql",
             "vim",
+            "vimdoc",
             "nix",
-         }, -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+            "hyprlang",
+         },
       },
       config = function(_, opts)
-         require("nvim-treesitter.configs").setup(opts)
+         local ts = require("nvim-treesitter")
+
+         if not ts.get_installed then
+            vim.notify("nvim-treesitter: run :TSUpdate and restart", vim.log.levels.ERROR)
+            return
+         end
+
+         ts.setup(opts)
+
+         local installed = ts.get_installed()
+         local to_install = vim.tbl_filter(function(lang)
+            return not vim.tbl_contains(installed, lang)
+         end, opts.ensure_installed or {})
+
+         if #to_install > 0 then
+            ts.install(to_install)
+         end
+
+         vim.api.nvim_create_autocmd("FileType", {
+            group = vim.api.nvim_create_augroup("treesitter_setup", { clear = true }),
+            callback = function(ev)
+               local buf = ev.buf
+               local ft = ev.match
+               local lang = vim.treesitter.language.get_lang(ft) or ft
+
+               local has_parser = pcall(vim.treesitter.language.inspect, lang)
+               if not has_parser then
+                  return
+               end
+
+               if opts.highlight and opts.highlight.enable then
+                  pcall(vim.treesitter.start, buf)
+               end
+
+               if opts.indent and opts.indent.enable then
+                  vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+               end
+
+               if opts.folds and opts.folds.enable then
+                  vim.wo[0][0].foldmethod = "expr"
+                  vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+               end
+            end,
+         })
+
          vim.treesitter.language.register("markdown", "octo")
       end,
    },
    {
-      "wurli/contextindent.nvim",
-      -- This is the only config option; you can use it to restrict the files
-      -- which this plugin will affect (see :help autocommand-pattern).
-      opts = { pattern = "*" },
-      dependencies = { "nvim-treesitter/nvim-treesitter" },
+      "nvim-treesitter/nvim-treesitter-textobjects",
+      branch = "main",
+      event = "VeryLazy",
+      opts = {
+         select = { lookahead = true },
+         move = { set_jumps = true },
+      },
+      config = function(_, opts)
+         local ts_textobjects = require("nvim-treesitter-textobjects")
+         if not ts_textobjects.setup then
+            vim.notify("nvim-treesitter-textobjects: update required", vim.log.levels.ERROR)
+            return
+         end
+         ts_textobjects.setup(opts)
+
+         vim.api.nvim_create_autocmd("FileType", {
+            group = vim.api.nvim_create_augroup("treesitter_textobjects", { clear = true }),
+            callback = function(ev)
+               local buf = ev.buf
+               local ft = ev.match
+               local lang = vim.treesitter.language.get_lang(ft) or ft
+               local has_parser = pcall(vim.treesitter.language.inspect, lang)
+               if not has_parser then
+                  return
+               end
+
+               local select_mod = require("nvim-treesitter-textobjects.select")
+               local move_mod = require("nvim-treesitter-textobjects.move")
+
+               local select_maps = {
+                  ["af"] = "@function.outer",
+                  ["if"] = "@function.inner",
+                  ["ac"] = "@class.outer",
+                  ["ic"] = "@class.inner",
+                  ["al"] = "@loop.outer",
+                  ["il"] = "@loop.inner",
+                  ["ab"] = "@block.outer",
+                  ["ib"] = "@block.inner",
+                  ["ar"] = "@parameter.outer",
+                  ["ir"] = "@parameter.inner",
+               }
+               for key, query in pairs(select_maps) do
+                  vim.keymap.set({ "x", "o" }, key, function()
+                     select_mod.select_textobject(query, "textobjects")
+                  end, { buffer = buf, silent = true })
+               end
+
+               local move_maps = {
+                  ["]]"] = { "goto_next_start", "@function.outer" },
+                  ["[["] = { "goto_previous_start", "@function.outer" },
+                  ["]m"] = { "goto_next_start", "@class.outer" },
+                  ["[m"] = { "goto_previous_start", "@class.outer" },
+               }
+               for key, cfg in pairs(move_maps) do
+                  vim.keymap.set({ "n", "x", "o" }, key, function()
+                     move_mod[cfg[1]](cfg[2], "textobjects")
+                  end, { buffer = buf, silent = true })
+               end
+            end,
+         })
+      end,
    },
+   -- NOTE: turning off for now as not working properly, indentation always starts from the new line
+   -- {
+   --    "wurli/contextindent.nvim",
+   --    -- This is the only config option; you can use it to restrict the files
+   --    -- which this plugin will affect (see :help autocommand-pattern).
+   --    opts = { pattern = "*" },
+   --    dependencies = { "nvim-treesitter/nvim-treesitter" },
+   -- },
 }
