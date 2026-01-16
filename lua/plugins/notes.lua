@@ -172,7 +172,9 @@ return {
                end
 
                local rel_path = buf_path:sub(#vault + 2) .. "/"
-               if rel_path == "/" then rel_path = "" end
+               if rel_path == "/" then
+                  rel_path = ""
+               end
 
                vim.ui.input({ prompt = "Note title: ", default = rel_path }, function(input)
                   if input and input ~= "" then
@@ -232,26 +234,26 @@ return {
             folder = "templates",
             date_format = "%Y-%m-%d",
             time_format = "%H:%M",
-         substitutions = {
-            alias = function(ctx)
-               if ctx.partial_note and ctx.partial_note.id then
-                  local id = ctx.partial_note.id
-                  -- Zettelkasten format: YYYYMMDDHHMM-title
-                  local extracted = id:match("^%d+%-(.+)$")
-                  if extracted then
-                     return extracted
+            substitutions = {
+               alias = function(ctx)
+                  if ctx.partial_note and ctx.partial_note.id then
+                     local id = ctx.partial_note.id
+                     -- Zettelkasten format: YYYYMMDDHHMM-title
+                     local extracted = id:match("^%d+%-(.+)$")
+                     if extracted then
+                        return extracted
+                     end
+                     -- Periodic notes: return ID as-is (2026-Q1, 2026-W01, etc.)
+                     if id:match("^%d%d%d%d%-") or id:match("^%d%d%d%d$") then
+                        return id
+                     end
                   end
-                  -- Periodic notes: return ID as-is (2026-Q1, 2026-W01, etc.)
-                  if id:match("^%d%d%d%d%-") or id:match("^%d%d%d%d$") then
-                     return id
-                  end
-               end
-               return ""
-            end,
-         },
+                  return ""
+               end,
+            },
          },
          attachments = {
-            img_folder = "media",
+            folder = "media",
          },
          ui = {
             enable = true,
@@ -273,9 +275,10 @@ return {
                if (not alias_to_add or alias_to_add == "") and note.id then
                   local id = note.id
                   -- Periodic notes: use ID as-is
-                  if id:match("^%d%d%d%d%-%d%d%-%d%d$") -- Daily
+                  if
+                     id:match("^%d%d%d%d%-%d%d%-%d%d$") -- Daily
                      or id:match("^%d%d%d%d%-Q%d$") -- Quarterly
-                     or id:match("^%d%d%d%d%-W%d%d$") -- Weekly
+                     or id:match("^%d%d%d%d%-W%d%d?$") -- Weekly
                      or id:match("^%d%d%d%d%-%d%d$") -- Monthly
                      or id:match("^%d%d%d%d$") -- Yearly
                   then
@@ -341,9 +344,10 @@ return {
                return os.date("%Y%m%d%H%M") .. "-inbox"
             end
             -- Periodic note patterns - pass through as-is
-            if title:match("^%d%d%d%d%-%d%d%-%d%d$") -- Daily: 2024-12-30
+            if
+               title:match("^%d%d%d%d%-%d%d%-%d%d$") -- Daily: 2024-12-30
                or title:match("^%d%d%d%d%-Q%d$") -- Quarterly: 2026-Q1
-               or title:match("^%d%d%d%d%-W%d%d$") -- Weekly: 2026-W01
+               or title:match("^%d%d%d%d%-W%d%d?$") -- Weekly: 2026-W01
                or title:match("^%d%d%d%d%-%d%d$") -- Monthly: 2026-01
                or title:match("^%d%d%d%d$") -- Yearly: 2026
             then
