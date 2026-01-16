@@ -39,9 +39,6 @@ return {
                         unusedvariable = true,
                      },
                      staticcheck = true,
-                     formatting = {
-                        gofumpt = true,
-                     },
                   },
                },
             },
