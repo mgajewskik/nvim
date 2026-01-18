@@ -150,7 +150,7 @@ return {
          { "<leader>zf", "<CMD>Obsidian quick_switch<CR>", { noremap = true } },
          { "<leader>zl", "<CMD>Obsidian links<CR>", { noremap = true } },
          { "<leader>zh", "<CMD>Obsidian backlinks<CR>", { noremap = true } },
-         { "<leader>zd", "<CMD>Obsidian dailies -2 1<CR>", { noremap = true } },
+         { "<leader>zd", "<CMD>ObsidianDailiesFzf -2 1<CR>", { noremap = true, desc = "Daily notes picker" } },
          { "<leader>znd", "<CMD>Obsidian today<CR>", { noremap = true } },
          {
             "<leader>znn",
@@ -215,7 +215,6 @@ return {
             max_lines = 3000,
          },
          completion = {
-            -- nvim_cmp = false,
             blink = true,
             min_chars = 2,
          },
@@ -223,11 +222,7 @@ return {
          daily_notes = {
             folder = vim.fn.expand("$NOTES_DAILY_PATH"),
             date_format = "%Y-%m-%d",
-            -- Optional, if you want to change the date format of the default alias of daily notes.
-            -- alias_format = "%B %-d, %Y",
-            -- Optional, default tags to add to each new daily note created.
             default_tags = { "daily" },
-            -- Optional, if you want to automatically insert a template from your template directory like 'daily.md'
             template = "daily.md",
          },
          templates = {
@@ -238,12 +233,10 @@ return {
                alias = function(ctx)
                   if ctx.partial_note and ctx.partial_note.id then
                      local id = ctx.partial_note.id
-                     -- Zettelkasten format: YYYYMMDDHHMM-title
                      local extracted = id:match("^%d+%-(.+)$")
                      if extracted then
                         return extracted
                      end
-                     -- Periodic notes: return ID as-is (2026-Q1, 2026-W01, etc.)
                      if id:match("^%d%d%d%d%-") or id:match("^%d%d%d%d$") then
                         return id
                      end
@@ -267,24 +260,20 @@ return {
             enabled = true,
             sort = { "id", "aliases", "tags" },
             func = function(note)
-               -- Preserve existing aliases and add title/filename as alias
                local aliases = note.aliases or {}
                local alias_to_add = note.title
 
-               -- Fallback: extract from ID if title is nil
                if (not alias_to_add or alias_to_add == "") and note.id then
                   local id = note.id
-                  -- Periodic notes: use ID as-is
                   if
-                     id:match("^%d%d%d%d%-%d%d%-%d%d$") -- Daily
-                     or id:match("^%d%d%d%d%-Q%d$") -- Quarterly
-                     or id:match("^%d%d%d%d%-W%d%d?$") -- Weekly
-                     or id:match("^%d%d%d%d%-%d%d$") -- Monthly
-                     or id:match("^%d%d%d%d$") -- Yearly
+                     id:match("^%d%d%d%d%-%d%d%-%d%d$")
+                     or id:match("^%d%d%d%d%-Q%d$")
+                     or id:match("^%d%d%d%d%-W%d%d?$")
+                     or id:match("^%d%d%d%d%-%d%d$")
+                     or id:match("^%d%d%d%d$")
                   then
                      alias_to_add = id
                   else
-                     -- Zettelkasten: extract from YYYYMMDDHHMM-title (12 digits)
                      local extracted = id:match("^%d%d%d%d%d%d%d%d%d%d%d%d%-(.+)$")
                      if extracted and extracted ~= "inbox" then
                         alias_to_add = extracted
@@ -296,10 +285,8 @@ return {
                   table.insert(aliases, alias_to_add)
                end
 
-               -- Preserve existing tags
                local tags = note.tags or {}
 
-               -- Add "daily" tag only for notes in daily folder (merge, no dups)
                local full_path = vim.fn.expand("%:p")
                local dir = full_path ~= "" and vim.fn.fnamemodify(full_path, ":h") or ""
                if dir ~= "" and string.find(dir:lower(), "daily") then
@@ -308,26 +295,22 @@ return {
                   end
                end
 
-               -- Add "inbox" tag for notes whose ID ends with "-inbox"
                if note.id and note.id:match("%-inbox$") then
                   if not vim.tbl_contains(tags, "inbox") then
                      table.insert(tags, "inbox")
                   end
                end
 
-               -- Add "untagged" only if still empty and has title (for normal notes)
                if #tags == 0 and note.title then
                   table.insert(tags, "untagged")
                end
 
-               -- Build the base frontmatter
                local out = {
                   id = note.id,
                   aliases = aliases,
                   tags = tags,
                }
 
-               -- Merge in any additional custom metadata
                if note.metadata and not vim.tbl_isempty(note.metadata) then
                   for k, v in pairs(note.metadata) do
                      if out[k] == nil then
@@ -343,28 +326,130 @@ return {
             if not title or title == "" then
                return os.date("%Y%m%d%H%M") .. "-inbox"
             end
-            -- Periodic note patterns - pass through as-is
             if
-               title:match("^%d%d%d%d%-%d%d%-%d%d$") -- Daily: 2024-12-30
-               or title:match("^%d%d%d%d%-Q%d$") -- Quarterly: 2026-Q1
-               or title:match("^%d%d%d%d%-W%d%d?$") -- Weekly: 2026-W01
-               or title:match("^%d%d%d%d%-%d%d$") -- Monthly: 2026-01
-               or title:match("^%d%d%d%d$") -- Yearly: 2026
+               title:match("^%d%d%d%d%-%d%d%-%d%d$")
+               or title:match("^%d%d%d%d%-Q%d$")
+               or title:match("^%d%d%d%d%-W%d%d?$")
+               or title:match("^%d%d%d%d%-%d%d$")
+               or title:match("^%d%d%d%d$")
             then
                return title
             end
-            -- Regular zettelkasten
             local timestamp = os.date("%Y%m%d%H%M")
             local safe_title = title:gsub("[/\\:]", "-")
             return string.format("%s-%s", timestamp, safe_title:gsub(" ", "-"):lower())
          end,
-         wiki_link_func = function(opts)
-            if opts.label then
-               return string.format("[[%s|%s]]", opts.path, opts.label)
+         wiki_link_func = function(wiki_opts)
+            if wiki_opts.label then
+               return string.format("[[%s|%s]]", wiki_opts.path, wiki_opts.label)
             else
-               return string.format("[[%s]]", opts.path)
+               return string.format("[[%s]]", wiki_opts.path)
             end
          end,
       },
+      config = function(_, opts)
+         local daily_folder = vim.fn.expand("$NOTES_PATH") .. "/" .. opts.daily_notes.folder
+
+         vim.api.nvim_create_user_command("ObsidianDailiesFzf", function(cmd_opts)
+            local fzf = require("fzf-lua")
+            local builtin = require("fzf-lua.previewer.builtin")
+
+            local offset_start, offset_end = -5, 1
+            if cmd_opts.fargs and #cmd_opts.fargs >= 2 then
+               offset_start = tonumber(cmd_opts.fargs[1]) or -5
+               offset_end = tonumber(cmd_opts.fargs[2]) or 1
+               if offset_start > offset_end then
+                  offset_start, offset_end = offset_end, offset_start
+               end
+            elseif cmd_opts.fargs and #cmd_opts.fargs == 1 then
+               local n = tonumber(cmd_opts.fargs[1]) or 0
+               if n >= 0 then
+                  offset_end = n
+               else
+                  offset_start = n
+               end
+            end
+
+            local entries = {}
+            local offset_map = {}
+
+            for offset = offset_end, offset_start, -1 do
+               local datetime = os.time() + (offset * 3600 * 24)
+               local date_str = os.date("%Y-%m-%d", datetime)
+               local filename = daily_folder .. "/" .. date_str .. ".md"
+               local display = os.date("%A %B %-d, %Y", datetime)
+
+               if offset == 0 then
+                  display = display .. " @today"
+               elseif offset == -1 then
+                  display = display .. " @yesterday"
+               elseif offset == 1 then
+                  display = display .. " @tomorrow"
+               end
+
+               if vim.fn.filereadable(filename) == 0 then
+                  display = display .. " ➡️ create"
+               end
+
+               entries[#entries + 1] = filename .. "\t" .. display
+               offset_map[filename] = offset
+            end
+
+            local DailyPreviewer = builtin.buffer_or_file:extend()
+
+            function DailyPreviewer:new(o, preview_opts, fzf_win)
+               DailyPreviewer.super.new(self, o, preview_opts, fzf_win)
+               setmetatable(self, DailyPreviewer)
+               return self
+            end
+
+            function DailyPreviewer:parse_entry(entry_str)
+               local path = entry_str:match("^([^\t]+)")
+               return {
+                  path = path,
+                  line = 1,
+                  col = 1,
+               }
+            end
+
+            fzf.fzf_exec(entries, {
+               prompt = "Dailies ❯ ",
+               previewer = DailyPreviewer,
+               fzf_opts = { ["--delimiter"] = "\t", ["--with-nth"] = "2" },
+               actions = {
+                  ["default"] = function(selected)
+                     if selected[1] then
+                        local filename = selected[1]:match("^([^\t]+)")
+                        local offset = offset_map[filename]
+                        vim.cmd("Obsidian today " .. offset)
+                     end
+                  end,
+                  ["ctrl-v"] = function(selected)
+                     if selected[1] then
+                        local filename = selected[1]:match("^([^\t]+)")
+                        local offset = offset_map[filename]
+                        vim.cmd("vsplit | Obsidian today " .. offset)
+                     end
+                  end,
+                  ["ctrl-s"] = function(selected)
+                     if selected[1] then
+                        local filename = selected[1]:match("^([^\t]+)")
+                        local offset = offset_map[filename]
+                        vim.cmd("split | Obsidian today " .. offset)
+                     end
+                  end,
+                  ["ctrl-t"] = function(selected)
+                     if selected[1] then
+                        local filename = selected[1]:match("^([^\t]+)")
+                        local offset = offset_map[filename]
+                        vim.cmd("tabedit | Obsidian today " .. offset)
+                     end
+                  end,
+               },
+            })
+         end, { nargs = "*", desc = "Pick daily notes with fzf-lua (preview + splits)" })
+
+         require("obsidian").setup(opts)
+      end,
    },
 }
