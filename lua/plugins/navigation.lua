@@ -173,32 +173,32 @@ return {
                git_icons = false,
                -- fd seems to work better than rg here
                -- cmd = "rg --files --hidden",
-               -- rg_opts = ripgrep_opts,
+               rg_opts = ripgrep_opts,
                -- adding sorting by created date at the end
-               fd_opts = [[
-               --color=auto \
-               --type f \
-               --hidden \
-               --no-ignore \
-               --follow \
-               --exclude .git \
-               --exclude venv \
-               --exclude .venv \
-               --exclude .node-gyp \
-               --exclude .cache \
-               --exclude .kube \
-               --exclude .dropbox-dist \
-               --exclude .mozilla \
-               --exclude .pyenv \
-               --exclude .tmux \
-               --exclude .trash \
-               --exclude .terraform \
-               --exclude *.pyc \
-               --exclude node_modules \
-               --exclude .mypy_cache \
-               --exclude vendor \
-               -X ls -t modified
-               ]],
+               -- fd_opts = [[
+               -- --color=auto \
+               -- --type f \
+               -- --hidden \
+               -- --no-ignore \
+               -- --follow \
+               -- --exclude .git \
+               -- --exclude venv \
+               -- --exclude .venv \
+               -- --exclude .node-gyp \
+               -- --exclude .cache \
+               -- --exclude .kube \
+               -- --exclude .dropbox-dist \
+               -- --exclude .mozilla \
+               -- --exclude .pyenv \
+               -- --exclude .tmux \
+               -- --exclude .trash \
+               -- --exclude .terraform \
+               -- --exclude *.pyc \
+               -- --exclude node_modules \
+               -- --exclude .mypy_cache \
+               -- --exclude vendor \
+               -- -X ls -t modified
+               -- ]],
             },
             grep = {
                git_icons = false,
