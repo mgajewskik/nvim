@@ -169,3 +169,15 @@ map("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result
 map("n", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
 map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
 map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
+
+map("n", "<leader>ts", function()
+   local file = vim.fn.expand("%:p")
+   if file == "" then
+      vim.notify("No file name", vim.log.levels.WARN)
+      return
+   end
+   vim.cmd("tab terminal presenterm " .. vim.fn.shellescape(file))
+   vim.defer_fn(function()
+      vim.cmd("startinsert")
+   end, 10) -- small delay, usually 1-50 ms is enough
+end, { desc = "New tab → presenterm current file" })
