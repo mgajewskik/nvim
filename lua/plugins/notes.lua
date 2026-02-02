@@ -152,14 +152,7 @@ return {
          { "<leader>zh", "<CMD>Obsidian backlinks<CR>", { noremap = true } },
          { "<leader>zd", "<CMD>ObsidianDailiesFzf -2 1<CR>", { noremap = true, desc = "Daily notes picker" } },
          { "<leader>znd", "<CMD>Obsidian today<CR>", { noremap = true } },
-         {
-            "<leader>znn",
-            function()
-               local title = vim.fn.input("Note title: ")
-               vim.cmd("Obsidian new_from_template " .. title .. " zettelkasten")
-            end,
-            { noremap = true, desc = "New note from zettelkasten template" },
-         },
+         { "<leader>znn", "<CMD>Obsidian new<CR>", { noremap = true, desc = "New note" } },
          {
             "<leader>znh",
             function()
@@ -178,11 +171,11 @@ return {
 
                vim.ui.input({ prompt = "Note title: ", default = rel_path }, function(input)
                   if input and input ~= "" then
-                     vim.cmd("Obsidian new_from_template " .. input .. " zettelkasten")
+                     vim.cmd("Obsidian new " .. input)
                   end
                end)
             end,
-            desc = "New zettelkasten note here",
+            desc = "New note here",
          },
          { "<leader>znt", "<CMD>Obsidian new_from_template<CR>", { noremap = true } },
          { "<leader>zz", "<CMD>Obsidian follow_link vsplit<CR>", { noremap = true } },
@@ -218,7 +211,8 @@ return {
             blink = true,
             min_chars = 2,
          },
-         new_notes_location = "notes_dir",
+         new_notes_location = "current_dir",
+         notes_subdir = "inbox",
          daily_notes = {
             folder = vim.fn.expand("$NOTES_DAILY_PATH"),
             date_format = "%Y-%m-%d",
@@ -230,18 +224,11 @@ return {
             date_format = "%Y-%m-%d",
             time_format = "%H:%M",
             substitutions = {
-               alias = function(ctx)
-                  if ctx.partial_note and ctx.partial_note.id then
-                     local id = ctx.partial_note.id
-                     local extracted = id:match("^%d+%-(.+)$")
-                     if extracted then
-                        return extracted
-                     end
-                     if id:match("^%d%d%d%d%-") or id:match("^%d%d%d%d$") then
-                        return id
-                     end
-                  end
-                  return ""
+               yesterday = function()
+                  return os.date("%Y-%m-%d", os.time() - 86400)
+               end,
+               tomorrow = function()
+                  return os.date("%Y-%m-%d", os.time() + 86400)
                end,
             },
          },
@@ -251,100 +238,46 @@ return {
          ui = {
             enable = true,
          },
+         statusline = {
+            enabled = false,
+         },
+         footer = {
+            enabled = false,
+         },
          checkbox = {
             enabled = true,
             create_new = true,
             order = { " ", "x" },
          },
          frontmatter = {
-            enabled = true,
-            sort = { "id", "aliases", "tags" },
-            func = function(note)
-               local aliases = note.aliases or {}
-               local alias_to_add = note.title
-
-               if (not alias_to_add or alias_to_add == "") and note.id then
-                  local id = note.id
-                  if
-                     id:match("^%d%d%d%d%-%d%d%-%d%d$")
-                     or id:match("^%d%d%d%d%-Q%d$")
-                     or id:match("^%d%d%d%d%-W%d%d?$")
-                     or id:match("^%d%d%d%d%-%d%d$")
-                     or id:match("^%d%d%d%d$")
-                  then
-                     alias_to_add = id
-                  else
-                     local extracted = id:match("^%d%d%d%d%d%d%d%d%d%d%d%d%-(.+)$")
-                     if extracted and extracted ~= "inbox" then
-                        alias_to_add = extracted
-                     end
-                  end
-               end
-
-               if alias_to_add and alias_to_add ~= "" and not vim.tbl_contains(aliases, alias_to_add) then
-                  table.insert(aliases, alias_to_add)
-               end
-
-               local tags = note.tags or {}
-
-               local full_path = vim.fn.expand("%:p")
-               local dir = full_path ~= "" and vim.fn.fnamemodify(full_path, ":h") or ""
-               if dir ~= "" and string.find(dir:lower(), "daily") then
-                  if not vim.tbl_contains(tags, "daily") then
-                     table.insert(tags, "daily")
-                  end
-               end
-
-               if note.id and note.id:match("%-inbox$") then
-                  if not vim.tbl_contains(tags, "inbox") then
-                     table.insert(tags, "inbox")
-                  end
-               end
-
-               if #tags == 0 and note.title then
-                  table.insert(tags, "untagged")
-               end
-
-               local out = {
-                  id = note.id,
-                  aliases = aliases,
-                  tags = tags,
-               }
-
-               if note.metadata and not vim.tbl_isempty(note.metadata) then
-                  for k, v in pairs(note.metadata) do
-                     if out[k] == nil then
-                        out[k] = v
-                     end
-                  end
-               end
-
-               return out
-            end,
+            enabled = false,
          },
          note_id_func = function(title)
             if not title or title == "" then
-               return os.date("%Y%m%d%H%M") .. "-inbox"
+               return os.date("%Y%m%d%H%M")
             end
-            if
-               title:match("^%d%d%d%d%-%d%d%-%d%d$")
-               or title:match("^%d%d%d%d%-Q%d$")
-               or title:match("^%d%d%d%d%-W%d%d?$")
-               or title:match("^%d%d%d%d%-%d%d$")
-               or title:match("^%d%d%d%d$")
-            then
-               return title
-            end
-            local timestamp = os.date("%Y%m%d%H%M")
-            local safe_title = title:gsub("[/\\:]", "-")
-            return string.format("%s-%s", timestamp, safe_title:gsub(" ", "-"):lower())
+            return title
          end,
-         wiki_link_func = function(wiki_opts)
-            if wiki_opts.label then
-               return string.format("[[%s|%s]]", wiki_opts.path, wiki_opts.label)
+         link = {
+            wiki = function(opts)
+               local header_or_block = ""
+               if opts.anchor then
+                  header_or_block = opts.anchor.anchor
+               elseif opts.block then
+                  header_or_block = string.format("#%s", opts.block.id)
+               end
+               local filename = vim.fs.basename(tostring(opts.path))
+               return string.format("[[%s%s]]", filename, header_or_block)
+            end,
+         },
+         note_path_func = function(spec)
+            local path
+            if spec.id:match("^%d%d%d%d%d%d%d%d%d%d%d%d$") then
+               path = spec.dir:parent() / "inbox" / tostring(spec.id)
             else
-               return string.format("[[%s]]", wiki_opts.path)
+               path = spec.dir / tostring(spec.id)
             end
+            return path:with_suffix(".md")
          end,
       },
       config = function(_, opts)
