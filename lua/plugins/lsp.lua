@@ -28,10 +28,10 @@ return {
             bashls = {},
             dockerls = {},
             gopls = {
-               -- filetypes = { "go", "gomod", "gohtmltmpl", "gotexttmpl" },
+               cmd = { "gopls", "-remote=auto" },
                settings = {
+                  telemetry = { enable = false },
                   gopls = {
-                     -- remote = "auto",
                      gofumpt = true,
                      analyses = {
                         shadow = true,
@@ -70,7 +70,7 @@ return {
                },
             },
             tflint = {},
-            marksman = {},
+            marksman = { enabled = false },
             vimls = {},
             -- spectral = {},
             buf_ls = {},
