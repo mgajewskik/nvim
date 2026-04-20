@@ -171,7 +171,7 @@ return {
          "moyiz/blink-emoji.nvim",
          { "saghen/blink.compat", lazy = true, version = false },
       },
-      version = "*",
+      version = "v1",
       opts = {
          completion = {
             accept = { auto_brackets = { enabled = true }, dot_repeat = false },
@@ -243,6 +243,7 @@ return {
                end
             end,
             providers = {
+               -- https://github.com/mikavilpas/blink-ripgrep.nvim?tab=readme-ov-file#full-config
                ripgrep = {
                   module = "blink-ripgrep",
                   name = "Ripgrep",
@@ -254,6 +255,14 @@ return {
                      -- search_casing = "--smart-case",
                      -- additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
                      fallback_to_regex_highlighting = true,
+                     backend = {
+                        ripgrep = {
+                           context_size = 5,
+                           additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
+                           max_filesize = "1M",
+                           search_casing = "--smart-case",
+                        },
+                     },
                   },
                },
                lazydev = {
@@ -270,14 +279,15 @@ return {
                },
             },
          },
-         backend = {
-            context_size = 5,
-            ripgrep = {
-               additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
-               max_filesize = "1M",
-               search_casing = "--smart-case",
-            },
-         },
+         -- TODO: to remove this if the switch is working well
+         -- backend = {
+         --    context_size = 5,
+         --    ripgrep = {
+         --       additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
+         --       max_filesize = "1M",
+         --       search_casing = "--smart-case",
+         --    },
+         -- },
       },
    },
 }
