@@ -214,7 +214,7 @@ return {
          }
       end,
       config = function(_, opts)
-         require("fzf-lua").setup("fzf-native")
+         opts = opts or {}
          require("fzf-lua").setup(opts)
          -- require("fzf-lua-frecency").setup({
          --    cwd_only = true,
