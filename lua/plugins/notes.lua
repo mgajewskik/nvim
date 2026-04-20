@@ -1,3 +1,57 @@
+local function create_obsidian_note(opts)
+   vim.ui.input({ prompt = opts.prompt or "Note title: " }, function(input)
+      if input == nil then
+         return
+      elseif input == "" then
+         input = nil
+      end
+
+      local note = require("obsidian.note").create({
+         id = input,
+         dir = opts.dir,
+         template = Obsidian.opts.note.template,
+         should_write = true,
+      })
+
+      note:open({ sync = true })
+   end)
+end
+
+local function create_obsidian_note_in_inbox()
+   local dir = Obsidian.dir
+   if Obsidian.opts.notes_subdir ~= nil then
+      dir = dir / Obsidian.opts.notes_subdir
+   end
+
+   create_obsidian_note({ dir = dir })
+end
+
+local function create_obsidian_note_in_current_dir()
+   local buf_path = vim.api.nvim_buf_get_name(0)
+   local Path = require("obsidian.path")
+
+   if buf_path == "" then
+      vim.notify("Current buffer has no file path", vim.log.levels.ERROR)
+      return
+   end
+
+   local dir = Path.new(vim.fs.dirname(buf_path)):resolve()
+   local in_workspace = false
+   for _, workspace in ipairs(Obsidian.workspaces) do
+      if workspace.root == dir or workspace.root:is_parent_of(dir) then
+         in_workspace = true
+         break
+      end
+   end
+
+   if not in_workspace then
+      vim.notify("Not in obsidian vault", vim.log.levels.ERROR)
+      return
+   end
+
+   create_obsidian_note({ dir = dir })
+end
+
 return {
    -- {
    --    "renerocksai/telekasten.nvim",
@@ -152,29 +206,10 @@ return {
          { "<leader>zh", "<CMD>Obsidian backlinks<CR>", { noremap = true } },
          { "<leader>zd", "<CMD>ObsidianDailiesFzf -2 1<CR>", { noremap = true, desc = "Daily notes picker" } },
          { "<leader>znd", "<CMD>Obsidian today<CR>", { noremap = true } },
-         { "<leader>znn", "<CMD>Obsidian new<CR>", { noremap = true, desc = "New note" } },
+         { "<leader>znn", create_obsidian_note_in_inbox, { noremap = true, desc = "New note in inbox" } },
          {
             "<leader>znh",
-            function()
-               local vault = vim.fn.expand("$NOTES_PATH")
-               local buf_path = vim.fn.expand("%:p:h")
-
-               if not buf_path:find(vault, 1, true) then
-                  vim.notify("Not in obsidian vault", vim.log.levels.ERROR)
-                  return
-               end
-
-               local rel_path = buf_path:sub(#vault + 2) .. "/"
-               if rel_path == "/" then
-                  rel_path = ""
-               end
-
-               vim.ui.input({ prompt = "Note title: ", default = rel_path }, function(input)
-                  if input and input ~= "" then
-                     vim.cmd("Obsidian new " .. input)
-                  end
-               end)
-            end,
+            create_obsidian_note_in_current_dir,
             desc = "New note here",
          },
          { "<leader>znt", "<CMD>Obsidian new_from_template<CR>", { noremap = true } },
@@ -211,7 +246,7 @@ return {
             blink = true,
             min_chars = 2,
          },
-         new_notes_location = "current_dir",
+         new_notes_location = "notes_subdir",
          notes_subdir = "inbox",
          daily_notes = {
             folder = vim.fn.expand("$NOTES_DAILY_PATH"),
@@ -269,17 +304,11 @@ return {
                local filename = vim.fs.basename(tostring(opts.path))
                return string.format("[[%s%s]]", filename, header_or_block)
             end,
-         },
-         note_path_func = function(spec)
-            local path
-            if spec.id:match("^%d%d%d%d%d%d%d%d%d%d%d%d$") then
-               path = spec.dir:parent() / "inbox" / tostring(spec.id)
-            else
-               path = spec.dir / tostring(spec.id)
-            end
-            return path:with_suffix(".md")
-         end,
-      },
+          },
+          note_path_func = function(spec)
+             return (spec.dir / tostring(spec.id)):with_suffix(".md")
+          end,
+       },
       config = function(_, opts)
          local daily_folder = vim.fn.expand("$NOTES_PATH") .. "/" .. opts.daily_notes.folder
 
