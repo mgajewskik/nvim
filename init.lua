@@ -1174,18 +1174,12 @@ local plugins = {
       opts = {
          ensure_installed = {
             "actionlint",
-            "cfn-lint",
             "yamllint",
-            "revive",
             "luacheck",
             "tfsec",
             "hadolint",
             "jsonlint",
-            "sqlfluff",
-            "protolint",
             "stylua",
-            "isort",
-            "black",
             "ruff",
             "golines",
             "gofumpt",
@@ -1197,8 +1191,6 @@ local plugins = {
             "shellcheck",
             "shellharden",
             "taplo",
-            "djlint",
-            "hyprls",
          },
       },
       config = function(_, opts)
@@ -1284,9 +1276,6 @@ local plugins = {
             marksman = { enabled = false },
             vimls = {},
             buf_ls = {},
-            hyprls = {
-               filetypes = { "*.hl", "hypr*.conf" },
-            },
             ts_ls = {},
          },
          setup = {},
@@ -1337,7 +1326,7 @@ local plugins = {
 
          local install = vim.tbl_filter(configure, vim.tbl_keys(opts.servers))
          require("mason-lspconfig").setup({
-            ensure_installed = install,
+            -- ensure_installed = install,
             automatic_enable = { exclude = mason_exclude },
          })
       end,
