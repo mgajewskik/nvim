@@ -1422,11 +1422,6 @@ local plugins = {
                      },
                   },
                },
-               lazydev = {
-                  name = "LazyDev",
-                  module = "lazydev.integrations.blink",
-                  score_offset = 100,
-               },
                emoji = {
                   module = "blink-emoji",
                   name = "Emoji",
