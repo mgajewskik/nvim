@@ -12,10 +12,6 @@ map("i", "jj", "<Esc>l", default_opts)
 map("i", "jk", "<Esc>l", default_opts)
 map("i", "kj", "<Esc>l", default_opts)
 
--- use these when neoscroll is dosabled
--- map("n", "<C-u>", "<C-u>zz", default_opts)
--- map("n", "<C-d>", "<C-d>zz", default_opts)
-
 -- 0 goes to first non-blank character
 -- map("n", "0", "^", { noremap = true })
 -- map("n", "^", "0", { noremap = true })
@@ -61,33 +57,19 @@ map("n", "<Leader>tO", ":tabfirst<CR>:tabonly<CR>", default_opts)
 -- map("n", "[B", ":bfirst<CR>", default_opts)
 -- map("n", "]B", ":blast<CR>", default_opts)
 -- Quickfix list mappings
--- map("n", "<leader>q", "<cmd>lua require'utils'.toggle_qf('q')<CR>", { noremap = true })
--- map("n", "<C-k>", ":cp<CR>", { noremap = true })
--- map("n", "<C-j>", ":cn<CR>", { noremap = true })
+map("n", "<leader>q", "<cmd>lua require'utils'.toggle_qf('q')<CR>", { noremap = true })
+map("n", "<C-k>", ":cp<CR>", { noremap = true })
+map("n", "<C-j>", ":cn<CR>", { noremap = true })
 -- map("n", "[q", ":cprevious<CR>", default_opts)
 -- map("n", "]q", ":cnext<CR>", default_opts)
 -- map("n", "[Q", ":cfirst<CR>", default_opts)
 -- map("n", "]Q", ":clast<CR>", default_opts)
 -- Location list mappings
--- map("n", "<leader>Q", "<cmd>lua require'utils'.toggle_qf('l')<CR>", { noremap = true })
+map("n", "<leader>Q", "<cmd>lua require'utils'.toggle_qf('l')<CR>", { noremap = true })
 -- map("n", "[l", ":lprevious<CR>", default_opts)
 -- map("n", "]l", ":lnext<CR>", default_opts)
 -- map("n", "[L", ":lfirst<CR>", default_opts)
 -- map("n", "]L", ":llast<CR>", default_opts)
-
--- Not using those as I manage my clipboard with greenclip
--- <leader>v|<leader>s act as <cmd-v>|<cmd-s>
--- <leader>p|P paste from yank register (0)
--- <leader>y|Y yank into clipboard/OSCyank
--- map({ "n", "v" }, "<leader>v", '"+p', { noremap = true })
--- map({ "n", "v" }, "<leader>V", '"+P', { noremap = true })
--- map({'n', 'v'}, '<leader>s', '"*p',   { noremap = true })
--- map({'n', 'v'}, '<leader>S', '"*P',   { noremap = true })
--- map({ "n", "v" }, "<leader>p", '"0p', { noremap = true })
--- map({ "n", "v" }, "<leader>P", '"0P', { noremap = true })
--- map({ "n", "v" }, "<leader>y", '"+y', { noremap = true })
--- map({ "n", "v" }, "y", '"+y', { noremap = true })
--- map({'n', 'v'}, '<leader>Y', ':OSCYank<CR>', { noremap = true })
 
 -- Overloads for 'd|c' that don't pollute the unnamed registers
 -- In visual-select mode 'd=delete, x=cut (unchanged)'
@@ -99,11 +81,6 @@ map("n", "<leader>D", '"_D', default_opts)
 map("n", "<leader>c", '"_c', default_opts)
 map("n", "<leader>C", '"_C', default_opts)
 map("v", "<leader>c", '"_c', default_opts)
-
--- Map `Y` to copy to end of line
--- conistent with the behaviour of `C` and `D`
--- map("n", "Y", "y$", default_opts)
--- map("v", "Y", "<Esc>y$gv", default_opts)
 
 -- keep visual selection when (de)indenting
 map("v", "<", "<gv", default_opts)
@@ -126,18 +103,6 @@ for _, c in ipairs({ "j", "k" }) do
    map("n", c, ([[(v:count > 5 ? "m'" . v:count : "") . '%s']]):format(c), expr_opts)
 end
 
--- -- move along visual lines, not numbered ones
--- -- without interfering with {count}<down|up>
--- for _, m in ipairs({ "n", "v" }) do
--- 	for _, c in ipairs({ "<up>", "<down>" }) do
--- 		map(m, c, ([[v:count == 0 ? 'g%s' : '%s']]):format(c, c), { noremap = true, expr = true, silent = true })
--- 	end
--- end
-
--- --Remap for dealing with visual line wraps
--- map("n", "k", "v:count == 0 ? 'gk' : 'k'", expr_opts)
--- map("n", "j", "v:count == 0 ? 'gj' : 'j'", expr_opts)
-
 -- Search and Replace
 -- 'c.' for word, '<leader>c.' for WORD
 map("n", "c.", [[:%s/\<<C-r><C-w>\>//g<Left><Left>]], default_opts)
@@ -155,13 +120,6 @@ map("n", "<leader><CR>", "o<Esc>", default_opts)
 -- map("n", "<leader>o", ':<C-u>call append(line("."), repeat([""], v:count1))<CR>', { noremap = true, silent = true })
 map("n", "<leader>O", ':<C-u>call append(line(".")-1, repeat([""], v:count1))<CR>', default_opts)
 
--- Resizing panes
--- tmux takes over those keymaps
--- map("n", "<C-Left>", ":vertical resize +2<CR>", default_opts)
--- map("n", "<C-Right>", ":vertical resize -2<CR>", default_opts)
--- map("n", "<C-Up>", ":resize -2<CR>", default_opts)
--- map("n", "<C-Down>", ":resize +2<CR>", default_opts)
-
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 map("n", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
 map("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
@@ -169,15 +127,3 @@ map("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result
 map("n", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
 map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
 map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
-
-map("n", "<leader>ts", function()
-   local file = vim.fn.expand("%:p")
-   if file == "" then
-      vim.notify("No file name", vim.log.levels.WARN)
-      return
-   end
-   vim.cmd("tab terminal presenterm " .. vim.fn.shellescape(file))
-   vim.defer_fn(function()
-      vim.cmd("startinsert")
-   end, 10) -- small delay, usually 1-50 ms is enough
-end, { desc = "New tab → presenterm current file" })

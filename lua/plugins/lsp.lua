@@ -145,29 +145,11 @@ return {
       end,
    },
    {
-      "simrat39/symbols-outline.nvim",
-      lazy = true,
-      cmd = "SymbolsOutline",
-      config = true,
-   },
-   {
-      "folke/trouble.nvim",
-      cmd = { "TroubleToggle", "Trouble" },
-      opts = { use_diagnostic_signs = true },
-   },
-   {
-      "folke/lazydev.nvim",
-      ft = "lua",
-      cmd = "LazyDev",
-      opts = {},
-   },
-   {
       -- https://cmp.saghen.dev/
       "saghen/blink.cmp",
       dependencies = {
          -- "rafamadriz/friendly-snippets",
          "mikavilpas/blink-ripgrep.nvim",
-         "folke/lazydev.nvim",
          "moyiz/blink-emoji.nvim",
          { "saghen/blink.compat", lazy = true, version = false },
       },
@@ -234,12 +216,12 @@ return {
                local cwd = vim.fn.getcwd()
                if cwd == vim.fn.expand("$HOME") or cwd == vim.fn.expand("$HOME/.config") then
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji" }
-                  return { "obsidian", "obsidian_new", "obsidian_tags", "lazydev", "lsp", "path", "buffer" }
+                  return { "lsp", "path", "buffer" }
                   -- return { "lazydev", "lsp", "path", "buffer" }
                else
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "emoji", "ripgrep" }
                   -- return { "lazydev", "lsp", "path", "buffer", "codecompanion", "ripgrep" }
-                  return { "obsidian", "obsidian_new", "obsidian_tags", "lazydev", "lsp", "path", "buffer", "ripgrep" }
+                  return { "lsp", "path", "buffer", "ripgrep" }
                end
             end,
             providers = {
@@ -279,15 +261,6 @@ return {
                },
             },
          },
-         -- TODO: to remove this if the switch is working well
-         -- backend = {
-         --    context_size = 5,
-         --    ripgrep = {
-         --       additional_rg_options = { "--ignore-file $HOME/.gitignore_global" },
-         --       max_filesize = "1M",
-         --       search_casing = "--smart-case",
-         --    },
-         -- },
       },
    },
 }

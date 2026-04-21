@@ -4,30 +4,6 @@ local function augroup(name, fnc)
    fnc(vim.api.nvim_create_augroup(name, { clear = true }))
 end
 
--- augroup("TestGroup", function(g)
--- 	aucmd({ "BufReadPost" }, {
--- 		group = g,
--- 		pattern = "*",
--- 		callback = function()
--- 			if vim.bo.filetype == "" then
--- 				vim.opt_local.filetype = "bash"
--- 			end
--- 		end,
--- 	})
--- end)
-
--- -- TODO wtf, I cannot make this work
--- augroup("CopilotDisable", function(g)
---    aucmd("BufEnter", {
---       group = g,
---       pattern = "*",
---       callback = function()
---          vim.cmd("Copilot disable<CR>")
---       end,
---       -- command = "Copilot disable",
---    })
--- end)
-
 augroup("HighlightYankedText", function(g)
    aucmd("TextYankPost", {
       group = g,
@@ -57,13 +33,13 @@ end)
 -- NOTE: this breaks Golang templates which have tabs in some newlines
 -- it would be good to be able to disable this directly in the conform config with DisableFormat
 --- Remove all trailing whitespace on save
--- augroup("TrimWhiteSpaceGrp", function(g)
---    aucmd("BufWritePre", {
---       group = g,
---       pattern = "*",
---       command = [[:%s/\s\+$//e]],
---    })
--- end)
+augroup("TrimWhiteSpaceGrp", function(g)
+   aucmd("BufWritePre", {
+      group = g,
+      pattern = "*",
+      command = [[:%s/\s\+$//e]],
+   })
+end)
 
 --- Remove all trailing new lines on save
 augroup("TrimNewLinesGrp", function(g)
@@ -86,18 +62,3 @@ augroup("AutoResize", function(g)
       end,
    })
 end)
-
--- Delete [No Name] buffers
--- augroup("BufDelete", function(g)
---    aucmd("BufHidden", {
---       group = g,
---       desc = "Delete [No Name] buffers",
---       callback = function(event)
---          if event.file == "" and vim.bo[event.buf].buftype == "" and not vim.bo[event.buf].modified then
---             vim.schedule(function()
---                pcall(vim.api.nvim_buf_delete, event.buf, {})
---             end)
---          end
---       end,
---    })
--- end)

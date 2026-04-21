@@ -17,16 +17,6 @@ return {
          require("flit").setup()
       end,
    },
-   -- {
-   --    "cbochs/portal.nvim",
-   --    event = "VeryLazy",
-   --    config = function()
-   --       local map = vim.keymap.set
-   --
-   --       map("n", "<leader>o", "<cmd>Portal jumplist backward<cr>", { noremap = true })
-   --       map("n", "<leader>i", "<cmd>Portal jumplist forward<cr>", { noremap = true })
-   --    end,
-   -- },
    {
       "mikavilpas/yazi.nvim",
       keys = {
@@ -49,24 +39,6 @@ return {
          },
       },
    },
-   -- {
-   --    "ptzz/lf.vim",
-   --    dependencies = {
-   --       "voldikss/vim-floaterm",
-   --    },
-   --    lazy = true,
-   --    keys = {
-   --       { "<C-e>", ":Lf<CR>", { noremap = true } },
-   --    },
-   --    init = function()
-   --       vim.g.lf_map_keys = 0
-   --       vim.g.lf_replace_netrw = 1
-   --       -- vim.g.floaterm_opener = "vsplit"
-   --       vim.g.floaterm_opener = "edit"
-   --       -- this does not work
-   --       -- vim.g.lf_command_override = 'lf -command "set hidden"'
-   --    end,
-   -- },
    {
       "kyazdani42/nvim-tree.lua",
       dependencies = {
@@ -228,152 +200,6 @@ return {
 
          map("n", "<C-r>", ":lua require('utils').home_fzf()<CR>", { noremap = true })
          map("n", "<leader>rr", ":lua require('utils').home_fzf('fd --type d -i -L')<CR>", { noremap = true })
-      end,
-   },
-   {
-      "nvim-telescope/telescope.nvim",
-      dependencies = {
-         -- "nvim-telescope/telescope-fzf-native.nvim", { 'do': 'make' }
-         -- "nvim-telescope/telescope-media-files.nvim"
-         -- "nvim-lua/popup.nvim",
-         "nvim-telescope/telescope-project.nvim",
-         "nvim-lua/plenary.nvim",
-      },
-      lazy = true,
-      keys = {
-         { "<leader>st", ":Telescope<CR>", { noremap = true } },
-         { "<leader>sp", ":Telescope project<CR>", { noremap = true } },
-      },
-      opts = function()
-         local actions = require("telescope.actions")
-         return {
-            defaults = {
-               prompt_prefix = "❯ ",
-               -- selection_caret = "❯ ",
-               selection_caret = " ",
-               selection_strategy = "reset",
-               sorting_strategy = "ascending",
-               scroll_strategy = "cycle",
-               color_devicons = true,
-               winblend = 0,
-               -- path_display = { "shorten" },
-               initial_mode = "insert",
-               --   border = {},
-               --   use_less = true,
-               --   set_env = { ["COLORTERM"] = "truecolor" }, -- default = nil,
-               layout_strategy = "flex",
-               layout_config = {
-                  width = 0.95,
-                  height = 0.85,
-                  prompt_position = "top",
-                  horizontal = {
-                     -- width_padding = 0.1,
-                     -- height_padding = 0.1,
-                     width = 0.9,
-                     preview_cutoff = 60,
-                     preview_width = function(_, cols, _)
-                        if cols > 200 then
-                           return math.floor(cols * 0.7)
-                        else
-                           return math.floor(cols * 0.6)
-                        end
-                     end,
-                  },
-                  vertical = {
-                     -- width_padding = 0.05,
-                     -- height_padding = 1,
-                     width = 0.75,
-                     height = 0.85,
-                     preview_height = 0.4,
-                     mirror = true,
-                  },
-                  flex = {
-                     -- change to horizontal after 120 cols
-                     flip_columns = 120,
-                  },
-               },
-               mappings = {
-                  i = {
-                     ["<C-x>"] = actions.delete_buffer,
-                     ["<C-s>"] = actions.select_horizontal,
-                     ["<C-v>"] = actions.select_vertical,
-                     ["<C-t>"] = actions.select_tab,
-
-                     ["<C-j>"] = actions.move_selection_next,
-                     ["<C-k>"] = actions.move_selection_previous,
-                     ["<S-up>"] = actions.preview_scrolling_up,
-                     ["<S-down>"] = actions.preview_scrolling_down,
-                     ["<C-up>"] = actions.preview_scrolling_up,
-                     ["<C-down>"] = actions.preview_scrolling_down,
-
-                     ["<C-u>"] = actions.move_to_top,
-                     ["<C-d>"] = actions.move_to_middle,
-                     ["<C-b>"] = actions.move_to_top,
-                     ["<C-f>"] = actions.move_to_bottom,
-
-                     ["<M-q>"] = actions.send_to_qflist + actions.open_qflist,
-                     ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
-
-                     ["<C-c>"] = actions.close,
-                     ["<Esc>"] = actions.close,
-                     -- ["<M-m>"] = actions.master_stack,
-                     ["<PageUp>"] = actions.results_scrolling_up,
-                     ["<PageDown>"] = actions.results_scrolling_down,
-                     ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
-                     ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-                     ["<c-h>"] = actions.which_key,
-                     ["<c-x>"] = actions.delete_buffer,
-                  },
-                  n = {
-                     ["<CR>"] = actions.select_default + actions.center,
-                     ["<C-x>"] = actions.delete_buffer,
-                     ["<C-s>"] = actions.select_horizontal,
-                     ["<C-v>"] = actions.select_vertical,
-                     ["<C-t>"] = actions.select_tab,
-
-                     ["j"] = actions.move_selection_next,
-                     ["k"] = actions.move_selection_previous,
-                     ["<S-up>"] = actions.preview_scrolling_up,
-                     ["<S-down>"] = actions.preview_scrolling_down,
-                     ["<C-up>"] = actions.preview_scrolling_up,
-                     ["<C-down>"] = actions.preview_scrolling_down,
-
-                     ["<C-u>"] = actions.move_to_top,
-                     ["<C-d>"] = actions.move_to_middle,
-                     ["<C-b>"] = actions.move_to_top,
-                     ["<C-f>"] = actions.move_to_bottom,
-
-                     ["<C-q>"] = actions.send_to_qflist,
-                     ["<M-q>"] = actions.send_to_qflist + actions.open_qflist,
-
-                     ["<C-c>"] = actions.close,
-                     -- ["<Esc>"] = false,
-                     ["<Esc>"] = actions.close,
-                     -- ["<Tab>"] = actions.toggle_selection,
-                  },
-               },
-            },
-            extensions = {
-               project = {
-                  base_dirs = {},
-               },
-            },
-         }
-      end,
-      config = function(_, opts)
-         local telescope = require("telescope")
-         telescope.setup(opts)
-         -- Default mappings (insert mode):
-         -- Key	Description
-         -- <c-d>	delete currently selected project
-         -- <c-v>	rename currently selected project
-         -- <c-a>	create a project*
-         -- <c-s>	search inside files within your project
-         -- <c-b>	browse inside files within your project
-         -- <c-l>	change to the selected project's directory without opening it
-         -- <c-r>	find a recently opened file within your project
-         -- <c-f>	find a file within your project (same as <CR>)
-         telescope.load_extension("project")
       end,
    },
    {

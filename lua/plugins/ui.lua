@@ -1,21 +1,4 @@
 return {
-   -- {
-   --    "karb94/neoscroll.nvim",
-   --    opts = {
-   --       hide_cursor = false,
-   --       -- easing = "circular",
-   --       duration_multiplier = 0.5,
-   --       mappings = {
-   --          "<C-u>",
-   --          "<C-d>",
-   --          "<C-b>",
-   --          "<C-y>",
-   --          "zt",
-   --          "zz",
-   --          "zb",
-   --       },
-   --    },
-   -- },
    {
       "akinsho/toggleterm.nvim",
       lazy = true,
@@ -31,43 +14,6 @@ return {
             -- width = math.floor(vim.o.columns * 0.85),
             -- height = math.floor(vim.o.lines * 0.8),
             winblend = 5,
-         },
-      },
-   },
-   -- {
-   --    "tzachar/local-highlight.nvim",
-   --    event = "VeryLazy",
-   --    opts = {
-   --       -- hlgroup = "CursorLine",
-   --       hlgroup = "TelescopeSelection",
-   --    },
-   --    -- config = function()
-   --    --    require("local-highlight").setup()
-   --    -- end,
-   -- },
-   -- {
-   -- throws some red errors, don't want to keep it
-   --    "winston0410/range-highlight.nvim",
-   --    event = "VeryLazy",
-   --    dependencies = {
-   --       "winston0410/cmd-parser.nvim",
-   --    },
-   --    config = function()
-   --       require("range-highlight").setup()
-   --    end,
-   -- },
-   -- {
-   --    "norcalli/nvim-colorizer.lua",
-   --    lazy = true,
-   --    cmd = "ColorizerToggle",
-   --    config = true,
-   -- },
-   {
-      "uga-rosa/ccc.nvim",
-      lazy = false,
-      opts = {
-         highlighter = {
-            auto_enable = true,
          },
       },
    },
@@ -180,49 +126,6 @@ return {
             tabline = {},
             extensions = { "nvim-tree", "toggleterm", "quickfix", "symbols-outline" },
          }
-      end,
-   },
-   {
-      "rcarriga/nvim-notify",
-      opts = {
-         timeout = 3000,
-         max_height = function()
-            return math.floor(vim.o.lines * 0.75)
-         end,
-         max_width = function()
-            return math.floor(vim.o.columns * 0.75)
-         end,
-      },
-      -- TODO this does not work for a while now - works when oooptions are turned off
-      -- opts = {
-      --    level = vim.log.levels.ERROR,
-      --    -- Animation style
-      --    stages = "fade_in_slide_out",
-      --    -- Function called when a new window is opened, use for changing win settings/config
-      --    on_open = nil,
-      --    -- Function called when a window is closed
-      --    on_close = nil,
-      --    -- Render function for notifications. See notify-render()
-      --    render = "default",
-      --    -- Default timeout for notifications
-      --    timeout = 2000,
-      --    -- For stages that change opacity this is treated as the highlight behind the window
-      --    -- Set this to either a highlight group, an RGB hex value e.g. "#000000" or a function returning an RGB code for dynamic values
-      --    background_colour = "#000000",
-      --    -- Minimum width for notification windows
-      --    minimum_width = 30,
-      --    -- Icons for the different levels
-      --    -- TODO add icons from file here
-      --    icons = {
-      --       ERROR = "",
-      --       WARN = "",
-      --       INFO = "",
-      --       DEBUG = "",
-      --       TRACE = "✎",
-      --    },
-      -- },
-      init = function()
-         vim.notify = require("notify")
       end,
    },
 }

@@ -71,28 +71,6 @@ return {
       },
    },
    {
-      "fredrikaverpil/godoc.nvim",
-      version = "*",
-      dependencies = {
-         {
-            "nvim-treesitter/nvim-treesitter",
-            opts = {
-               ensure_installed = { "go" },
-            },
-         },
-      },
-      -- build = "go install github.com/lotusirous/gostdsym/stdsym@latest", -- optional
-      cmd = { "GoDoc" },
-      opts = {
-         window = {
-            type = "vsplit",
-         },
-         picker = {
-            type = "telescope",
-         },
-      },
-   },
-   {
       "hashivim/vim-terraform",
       config = function()
          vim.cmd("let g:terraform_align=1")
@@ -125,7 +103,6 @@ return {
             gohtmltmpl = { "djlint" },
             -- terraform = { "terraform_fmt" },  -- moves cursor to the end of the file
             hcl = { "terraform_fmt" },
-            nix = { "nixfmt" },
          },
          notify_on_error = true,
          format_on_save = function(bufnr)
@@ -189,13 +166,11 @@ return {
             -- go = { "golangcilint" }, -- golangci-lint is not working
             -- go = { "golangcilint", "revive" }, -- golangci-lint is not working
             go = { "revive" },
-            proto = { "protolint" },
             lua = { "luacheck" },
             terraform = { "tfsec" },
             dockerfile = { "hadolint" },
             json = { "jsonlint" },
             sql = { "sqlfluff" },
-            nix = { "nix" },
          },
       },
       config = function(_, opts)

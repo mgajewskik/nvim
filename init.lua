@@ -23,32 +23,6 @@ require("lazy").setup("plugins", {
    change_detection = {
       enabled = false,
    },
-   performance = {
-      rtp = {
-         disabled_plugins = {
-            "netrw",
-            "netrwPlugin",
-            "netrwSettings",
-            "netrwFileHandlers",
-            "gzip",
-            "zip",
-            "zipPlugin",
-            "tar",
-            "tarPlugin",
-            "getscript",
-            "getscriptPlugin",
-            "vimball",
-            "vimballPlugin",
-            "2html_plugin",
-            "logipat",
-            "rrhelper",
-            "spellfile_plugin",
-            "fzf",
-            -- 'matchit',
-            --'matchparen',
-         },
-      },
-   },
 })
 
 require("filetypes")
@@ -57,7 +31,6 @@ vim.api.nvim_create_autocmd("User", {
    pattern = "VeryLazy",
    callback = function()
       require("keymaps")
-      require("cmd")
       require("autocmd")
       -- require("filetypes")
       -- not needed anymore as I am using Obsidian.nvim
