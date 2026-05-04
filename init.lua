@@ -790,7 +790,8 @@ local plugins = {
          { "<leader>`", ":FzfLua buffers<CR>", { noremap = true } },
          { "<leader><leader>", ":FzfLua buffers<CR>", { noremap = true } },
          { "<leader>\\", ":FzfLua grep_visual<CR>", { noremap = true } },
-         { "\\", ":FzfLua live_grep<CR>", { noremap = true } },
+         -- NOTE: below should be \\\\
+         { "\\\\", ":FzfLua live_grep<CR>", { noremap = true } },
          { "//", ":FzfLua blines<CR>", { noremap = true } },
          { "<leader>sq", ":FzfLua quickfix<CR>", { noremap = true } },
          { "gr", ":FzfLua lsp_references<CR>", { noremap = true } },
