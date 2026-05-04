@@ -70,10 +70,8 @@ local icons = {
    },
 }
 
-local utils = {}
-
 -- Search through home directories and explore without performance issues.
-function utils.home_fzf()
+local function home_fzf()
    local fzf_lua = require("fzf-lua")
    local opts = {
       cwd = vim.fn.expand("$HOME"),
@@ -96,7 +94,7 @@ function utils.home_fzf()
    fzf_lua.fzf_exec("fd --type d -i -L -E 'venv'", opts)
 end
 
-function utils.lsp_on_attach()
+local function lsp_on_attach()
    vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(args)
          local map = vim.keymap.set
@@ -118,31 +116,31 @@ function utils.lsp_on_attach()
    })
 end
 
-function utils._echo_multiline(msg)
+local function echo_multiline(msg)
    for _, s in ipairs(vim.fn.split(msg, "\n")) do
       vim.cmd("echom '" .. s:gsub("'", "''") .. "'")
    end
 end
 
-function utils.info(msg)
+local function info(msg)
    vim.cmd("echohl Directory")
-   utils._echo_multiline(msg)
+   echo_multiline(msg)
    vim.cmd("echohl None")
 end
 
-function utils.warn(msg)
+local function warn(msg)
    vim.cmd("echohl WarningMsg")
-   utils._echo_multiline(msg)
+   echo_multiline(msg)
    vim.cmd("echohl None")
 end
 
-function utils.err(msg)
+local function err(msg)
    vim.cmd("echohl ErrorMsg")
-   utils._echo_multiline(msg)
+   echo_multiline(msg)
    vim.cmd("echohl None")
 end
 
-function utils.find_qf(kind)
+local function find_qf(kind)
    local win_tbl = {}
    for _, win in pairs(vim.fn.getwininfo()) do
       local found = false
@@ -159,7 +157,7 @@ function utils.find_qf(kind)
    return win_tbl
 end
 
-function utils.open_qf()
+local function open_qf()
    if not vim.tbl_isempty(vim.fn.getqflist()) then
       vim.cmd("copen")
       vim.cmd("wincmd J")
@@ -168,7 +166,7 @@ function utils.open_qf()
    end
 end
 
-function utils.open_loclist_all()
+local function open_loclist_all()
    for _, win in pairs(vim.fn.getwininfo()) do
       if win.quickfix == 0 then
          if not vim.tbl_isempty(vim.fn.getloclist(win.winnr)) then
@@ -181,8 +179,8 @@ function utils.open_loclist_all()
    end
 end
 
-function utils.toggle_qf(kind)
-   local windows = utils.find_qf(kind)
+local function toggle_qf(kind)
+   local windows = find_qf(kind)
    if #windows > 0 then
       for _, win in pairs(windows) do
          vim.api.nvim_win_hide(win.winid)
@@ -191,23 +189,23 @@ function utils.toggle_qf(kind)
    end
 
    if kind == "l" then
-      utils.open_loclist_all()
+      open_loclist_all()
    else
-      utils.open_qf()
+      open_qf()
    end
 end
 
-function utils.sudo_exec(cmd, print_output)
+local function sudo_exec(cmd, print_output)
    local password = vim.fn.inputsecret("Password: ")
    if not password or #password == 0 then
-      utils.warn("Invalid password, sudo aborted")
+      warn("Invalid password, sudo aborted")
       return false
    end
 
    local out = vim.fn.system(string.format("sudo -p '' -S %s", cmd), password)
    if vim.v.shell_error ~= 0 then
       print("\r\n")
-      utils.err(out)
+      err(out)
       return false
    end
 
@@ -217,25 +215,25 @@ function utils.sudo_exec(cmd, print_output)
    return true
 end
 
-function utils.sudo_write(tmpfile, filepath)
+local function sudo_write(tmpfile, filepath)
    tmpfile = tmpfile or vim.fn.tempname()
    filepath = filepath or vim.fn.expand("%")
    if not filepath or #filepath == 0 then
-      utils.err("E32: No file name")
+      err("E32: No file name")
       return
    end
 
    -- `bs=1048576` is portable across GNU/BSD dd.
    local cmd = string.format("dd if=%s of=%s bs=1048576", vim.fn.shellescape(tmpfile), vim.fn.shellescape(filepath))
    vim.api.nvim_exec(string.format("write! %s", tmpfile), true)
-   if utils.sudo_exec(cmd) then
-      utils.info(string.format('\r\n"%s" written', filepath))
+   if sudo_exec(cmd) then
+      info(string.format('\r\n"%s" written', filepath))
       vim.cmd("e!")
    end
    vim.fn.delete(tmpfile)
 end
 
-function utils.jump_to_word(ignore_underscore)
+local function jump_to_word(ignore_underscore)
    local search = require("leap.search")
    local modify_keyword = false
    local ch = vim.fn.getcharstr()
@@ -523,7 +521,7 @@ end)
 -- ============================================================================
 
 vim.api.nvim_create_user_command("SudoWriteCurrent", function()
-   utils.sudo_write()
+   sudo_write()
 end, { desc = "Write current file with sudo" })
 
 local map = vim.keymap.set
@@ -531,7 +529,7 @@ local default_opts = { noremap = true, silent = true }
 local expr_opts = { noremap = true, silent = true, expr = true }
 
 map("n", "<C-s>", function()
-   utils.jump_to_word(false)
+   jump_to_word(false)
 end, default_opts)
 
 map("n", "<leader>ll", "<cmd>:Lazy<cr>", default_opts)
@@ -569,7 +567,7 @@ map("n", "[B", ":bfirst<CR>", default_opts)
 map("n", "]B", ":blast<CR>", default_opts)
 
 map("n", "<leader>q", function()
-   utils.toggle_qf("q")
+   toggle_qf("q")
 end, { noremap = true })
 map("n", "<C-k>", ":cp<CR>", { noremap = true })
 map("n", "<C-j>", ":cn<CR>", { noremap = true })
@@ -579,7 +577,7 @@ map("n", "[Q", ":cfirst<CR>", default_opts)
 map("n", "]Q", ":clast<CR>", default_opts)
 
 map("n", "<leader>Q", function()
-   utils.toggle_qf("l")
+   toggle_qf("l")
 end, { noremap = true })
 map("n", "[l", ":lprevious<CR>", default_opts)
 map("n", "]l", ":lnext<CR>", default_opts)
@@ -856,10 +854,10 @@ local plugins = {
 
          vim.keymap.set("n", "<leader>ws", ":FzfLua grep_cword<CR>", { noremap = true })
          vim.keymap.set("n", "<C-r>", function()
-            utils.home_fzf()
+            home_fzf()
          end, { noremap = true })
          vim.keymap.set("n", "<leader>rr", function()
-            utils.home_fzf()
+            home_fzf()
          end, { noremap = true })
          vim.keymap.set("n", "<leader>zf", function()
             require("fzf-lua").files({ cwd = notes_cwd })
@@ -1281,7 +1279,7 @@ local plugins = {
          setup = {},
       },
       config = function(_, opts)
-         utils.lsp_on_attach()
+         lsp_on_attach()
 
          vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
