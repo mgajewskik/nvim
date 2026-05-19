@@ -275,6 +275,85 @@ local function augroup(name, callback)
    callback(vim.api.nvim_create_augroup(name, { clear = true }))
 end
 
+local function env_path_or_default(name, fallback)
+   local value = vim.env[name]
+   if value == nil or value == "" then
+      value = fallback
+   end
+   return vim.fn.expand(value)
+end
+
+local function join_path(root, child)
+   if child == nil or child == "" then
+      return root
+   end
+
+   child = vim.fn.expand(child)
+   if child:sub(1, 1) == "/" then
+      return child
+   end
+
+   return root:gsub("/+$", "") .. "/" .. child:gsub("^/+", "")
+end
+
+local obsidian_vault_dir = env_path_or_default("NOTES", "~/notes")
+local obsidian_daily_notes_dir = env_path_or_default("NOTES_DAILY_PATH", "area/journal/daily")
+local obsidian_daily_notes_path = join_path(obsidian_vault_dir, obsidian_daily_notes_dir)
+
+local function create_obsidian_note(opts)
+   vim.ui.input({ prompt = opts.prompt or "Note title: " }, function(input)
+      if input == nil then
+         return
+      elseif input == "" then
+         input = nil
+      end
+
+      local note = require("obsidian.note").create({
+         id = input,
+         dir = opts.dir,
+         template = Obsidian.opts.note.template,
+         should_write = true,
+      })
+
+      note:open({ sync = true })
+   end)
+end
+
+local function create_obsidian_note_in_inbox()
+   local dir = Obsidian.dir
+   if Obsidian.opts.notes_subdir ~= nil then
+      dir = dir / Obsidian.opts.notes_subdir
+   end
+
+   create_obsidian_note({ dir = dir })
+end
+
+local function create_obsidian_note_in_current_dir()
+   local buf_path = vim.api.nvim_buf_get_name(0)
+   local Path = require("obsidian.path")
+
+   if buf_path == "" then
+      vim.notify("Current buffer has no file path", vim.log.levels.ERROR)
+      return
+   end
+
+   local dir = Path.new(vim.fs.dirname(buf_path)):resolve()
+   local in_workspace = false
+   for _, workspace in ipairs(Obsidian.workspaces) do
+      if workspace.root == dir or workspace.root:is_parent_of(dir) then
+         in_workspace = true
+         break
+      end
+   end
+
+   if not in_workspace then
+      vim.notify("Not in obsidian vault", vim.log.levels.ERROR)
+      return
+   end
+
+   create_obsidian_note({ dir = dir })
+end
+
 -- ============================================================================
 -- core options
 -- ============================================================================
@@ -785,7 +864,14 @@ local plugins = {
          { "<leader>rf", ":FzfLua files cwd=$HOME/<CR>", { noremap = true } },
          { "<leader>sn", ":FzfLua files cwd=$HOME/.config/nvim/<CR>", { noremap = true } },
          { "<leader>si", ":FzfLua files cwd=$HOME/.config/<CR>", { noremap = true } },
-         { "<leader>sw", ":FzfLua files cwd=$HOME/notes/<CR>", { noremap = true } },
+         {
+            "<leader>sw",
+            function()
+               require("fzf-lua").files({ cwd = obsidian_vault_dir })
+            end,
+            noremap = true,
+            desc = "Notes files",
+         },
          { "<leader>f", ":FzfLua git_files<CR>", { noremap = true } },
          { "<leader>`", ":FzfLua buffers<CR>", { noremap = true } },
          { "<leader><leader>", ":FzfLua buffers<CR>", { noremap = true } },
@@ -851,8 +937,6 @@ local plugins = {
       end,
       config = function(_, opts)
          require("fzf-lua").setup(opts or {})
-         local notes_cwd = vim.fn.expand("$HOME/notes")
-
          vim.keymap.set("n", "<leader>ws", ":FzfLua grep_cword<CR>", { noremap = true })
          vim.keymap.set("n", "<C-r>", function()
             home_fzf()
@@ -860,12 +944,228 @@ local plugins = {
          vim.keymap.set("n", "<leader>rr", function()
             home_fzf()
          end, { noremap = true })
-         vim.keymap.set("n", "<leader>zf", function()
-            require("fzf-lua").files({ cwd = notes_cwd })
-         end, { noremap = true, silent = true, desc = "Notes files" })
-         vim.keymap.set("n", "<leader>zs", function()
-            require("fzf-lua").live_grep({ cwd = notes_cwd })
-         end, { noremap = true, silent = true, desc = "Notes grep" })
+      end,
+   },
+   {
+      "obsidian-nvim/obsidian.nvim",
+      version = "*",
+      lazy = false,
+      ft = "markdown",
+      dependencies = {
+         "nvim-lua/plenary.nvim",
+      },
+      keys = {
+         { "<leader>zs", "<CMD>Obsidian search<CR>", noremap = true },
+         { "<leader>zf", "<CMD>Obsidian quick_switch<CR>", noremap = true },
+         { "<leader>zl", "<CMD>Obsidian links<CR>", noremap = true },
+         { "<leader>zh", "<CMD>Obsidian backlinks<CR>", noremap = true },
+         { "<leader>zd", "<CMD>ObsidianDailiesFzf -2 1<CR>", noremap = true, desc = "Daily notes picker" },
+         { "<leader>znd", "<CMD>Obsidian today<CR>", noremap = true },
+         { "<leader>znn", create_obsidian_note_in_inbox, noremap = true, desc = "New note in inbox" },
+         {
+            "<leader>znh",
+            create_obsidian_note_in_current_dir,
+            noremap = true,
+            desc = "New note here",
+         },
+         { "<leader>znt", "<CMD>Obsidian new_from_template<CR>", noremap = true },
+         { "<leader>zz", "<CMD>Obsidian follow_link vsplit<CR>", noremap = true },
+         { "<leader>zt", "<CMD>Obsidian tags<CR>", noremap = true },
+         { "<leader>zr", "<CMD>Obsidian rename<CR>", noremap = true },
+         { "<leader>za", "<CMD>Obsidian toggle_checkbox<CR>", noremap = true },
+      },
+      opts = {
+         legacy_commands = false,
+         workspaces = {
+            {
+               name = "notes",
+               path = obsidian_vault_dir,
+            },
+         },
+         picker = {
+            name = "fzf-lua",
+            note_mappings = {
+               new = "<C-x>",
+               insert_link = "<C-l>",
+            },
+            tag_mappings = {
+               tag_note = "<C-x>",
+               insert_tag = "<C-l>",
+            },
+         },
+         search = {
+            sort_by = "modified",
+            sort_reversed = true,
+            max_lines = 3000,
+         },
+         completion = {
+            blink = true,
+            min_chars = 2,
+         },
+         new_notes_location = "notes_subdir",
+         notes_subdir = "inbox",
+         daily_notes = {
+            folder = obsidian_daily_notes_dir,
+            date_format = "%Y-%m-%d",
+            default_tags = { "daily" },
+            template = "daily.md",
+         },
+         templates = {
+            folder = "templates",
+            date_format = "%Y-%m-%d",
+            time_format = "%H:%M",
+            substitutions = {
+               yesterday = function()
+                  return os.date("%Y-%m-%d", os.time() - 86400)
+               end,
+               tomorrow = function()
+                  return os.date("%Y-%m-%d", os.time() + 86400)
+               end,
+            },
+         },
+         attachments = {
+            folder = "media",
+         },
+         ui = {
+            enable = true,
+         },
+         statusline = {
+            enabled = false,
+         },
+         footer = {
+            enabled = false,
+         },
+         checkbox = {
+            enabled = true,
+            create_new = true,
+            order = { " ", "x" },
+         },
+         frontmatter = {
+            enabled = false,
+         },
+         note_id_func = function(title)
+            if not title or title == "" then
+               return os.date("%Y%m%d%H%M")
+            end
+            return title
+         end,
+         link = {
+            wiki = function(opts)
+               local header_or_block = ""
+               if opts.anchor then
+                  header_or_block = opts.anchor.anchor
+               elseif opts.block then
+                  header_or_block = string.format("#%s", opts.block.id)
+               end
+               local filename = vim.fs.basename(tostring(opts.path))
+               return string.format("[[%s%s]]", filename, header_or_block)
+            end,
+         },
+         note_path_func = function(spec)
+            return (spec.dir / tostring(spec.id)):with_suffix(".md")
+         end,
+      },
+      config = function(_, opts)
+         vim.api.nvim_create_user_command("ObsidianDailiesFzf", function(cmd_opts)
+            local fzf = require("fzf-lua")
+            local builtin = require("fzf-lua.previewer.builtin")
+
+            local offset_start, offset_end = -5, 1
+            if cmd_opts.fargs and #cmd_opts.fargs >= 2 then
+               offset_start = tonumber(cmd_opts.fargs[1]) or -5
+               offset_end = tonumber(cmd_opts.fargs[2]) or 1
+               if offset_start > offset_end then
+                  offset_start, offset_end = offset_end, offset_start
+               end
+            elseif cmd_opts.fargs and #cmd_opts.fargs == 1 then
+               local n = tonumber(cmd_opts.fargs[1]) or 0
+               if n >= 0 then
+                  offset_end = n
+               else
+                  offset_start = n
+               end
+            end
+
+            local entries = {}
+            local offset_map = {}
+
+            for offset = offset_end, offset_start, -1 do
+               local datetime = os.time() + (offset * 3600 * 24)
+               local date_str = os.date("%Y-%m-%d", datetime)
+               local filename = obsidian_daily_notes_path .. "/" .. date_str .. ".md"
+               local display = os.date("%A %B %-d, %Y", datetime)
+
+               if offset == 0 then
+                  display = display .. " @today"
+               elseif offset == -1 then
+                  display = display .. " @yesterday"
+               elseif offset == 1 then
+                  display = display .. " @tomorrow"
+               end
+
+               if vim.fn.filereadable(filename) == 0 then
+                  display = display .. " ➡️ create"
+               end
+
+               entries[#entries + 1] = filename .. "\t" .. display
+               offset_map[filename] = offset
+            end
+
+            local DailyPreviewer = builtin.buffer_or_file:extend()
+
+            function DailyPreviewer:new(o, preview_opts, fzf_win)
+               DailyPreviewer.super.new(self, o, preview_opts, fzf_win)
+               setmetatable(self, DailyPreviewer)
+               return self
+            end
+
+            function DailyPreviewer:parse_entry(entry_str)
+               local path = entry_str:match("^([^\t]+)")
+               return {
+                  path = path,
+                  line = 1,
+                  col = 1,
+               }
+            end
+
+            fzf.fzf_exec(entries, {
+               prompt = "Dailies ❯ ",
+               previewer = DailyPreviewer,
+               fzf_opts = { ["--delimiter"] = "\t", ["--with-nth"] = "2" },
+               actions = {
+                  ["default"] = function(selected)
+                     if selected[1] then
+                        local filename = selected[1]:match("^([^\t]+)")
+                        local offset = offset_map[filename]
+                        vim.cmd("Obsidian today " .. offset)
+                     end
+                  end,
+                  ["ctrl-v"] = function(selected)
+                     if selected[1] then
+                        local filename = selected[1]:match("^([^\t]+)")
+                        local offset = offset_map[filename]
+                        vim.cmd("vsplit | Obsidian today " .. offset)
+                     end
+                  end,
+                  ["ctrl-s"] = function(selected)
+                     if selected[1] then
+                        local filename = selected[1]:match("^([^\t]+)")
+                        local offset = offset_map[filename]
+                        vim.cmd("split | Obsidian today " .. offset)
+                     end
+                  end,
+                  ["ctrl-t"] = function(selected)
+                     if selected[1] then
+                        local filename = selected[1]:match("^([^\t]+)")
+                        local offset = offset_map[filename]
+                        vim.cmd("tabedit | Obsidian today " .. offset)
+                     end
+                  end,
+               },
+            })
+         end, { nargs = "*", desc = "Pick daily notes with fzf-lua (preview + splits)" })
+
+         require("obsidian").setup(opts)
       end,
    },
    {
@@ -1251,7 +1551,7 @@ local plugins = {
                settings = {
                   Lua = {
                      diagnostics = {
-                        globals = { "vim", "require" },
+                        globals = { "vim", "require", "Obsidian" },
                      },
                      completion = {
                         callSnippet = "Replace",
