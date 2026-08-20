@@ -171,34 +171,10 @@ return {
             },
             files = {
                git_icons = false,
-               -- fd seems to work better than rg here
-               -- cmd = "rg --files --hidden",
-               rg_opts = ripgrep_opts,
-               -- adding sorting by created date at the end
-               -- fd_opts = [[
-               -- --color=auto \
-               -- --type f \
-               -- --hidden \
-               -- --no-ignore \
-               -- --follow \
-               -- --exclude .git \
-               -- --exclude venv \
-               -- --exclude .venv \
-               -- --exclude .node-gyp \
-               -- --exclude .cache \
-               -- --exclude .kube \
-               -- --exclude .dropbox-dist \
-               -- --exclude .mozilla \
-               -- --exclude .pyenv \
-               -- --exclude .tmux \
-               -- --exclude .trash \
-               -- --exclude .terraform \
-               -- --exclude *.pyc \
-               -- --exclude node_modules \
-               -- --exclude .mypy_cache \
-               -- --exclude vendor \
-               -- -X ls -t modified
-               -- ]],
+               -- fzf-lua prefers fd over rg when available; rg_opts alone never applied
+               no_ignore = true,
+               fd_opts = [[--color=never --type f --type l --no-ignore --hidden --exclude .git]],
+               rg_opts = [[--color=never --files --no-ignore --hidden -g "!.git"]],
             },
             grep = {
                git_icons = false,
