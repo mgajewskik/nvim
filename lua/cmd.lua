@@ -5,8 +5,9 @@ local cmd = vim.api.nvim_create_user_command
 -- vim.cmd([[:command Md ! litemdview %:p & disown]])
 
 cmd("Jfmt", "%!jq --indent 4 .", {})
-cmd("MD", "! litemdview % &", {})
-cmd("Md", "! litemdview %:p & disown", {})
+-- cmd("MD", "! litemdview % &", {})
+-- cmd("Md", "! litemdview %:p & disown", {})
+cmd("MD", "vertical botright terminal leaf -w %", {})
 
 vim.cmd([[cab cc CodeCompanion]])
 vim.cmd([[cab ca CodeCompanionChat Add]])
