@@ -45,6 +45,7 @@ return {
       cmd = "Neogit",
       keys = {
          { "<leader>gs", ":Neogit<CR>", { noremap = true, silent = true } },
+         { "<leader>gg", ":Neogit<CR>", { noremap = true, silent = true } },
       },
       opts = {
          integrations = {
