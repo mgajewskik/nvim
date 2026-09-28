@@ -1,4 +1,10 @@
 return {
+   {
+      "ChmaraX/herdr-nvim",
+      opts = {
+         keymaps = false,
+      },
+   },
    -- {
    --    -- https://codecompanion.olimorris.dev/
    --    "olimorris/codecompanion.nvim",
