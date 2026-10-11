@@ -125,11 +125,10 @@ for _, c in ipairs({ "j", "k" }) do
    map("n", c, ([[(v:count > 5 ? "m'" . v:count : "") . '%s']]):format(c), { silent = true, expr = true })
 end
 
--- Replace the word under the cursor: 'c.' word, '<leader>c.' WORD in this file,
--- '<leader>R' word in every file of the quickfix list. Not silent: the cmdline must show.
+-- Replace the word under the cursor: 'c.' in this file, '<leader>c.' in every file
+-- of the quickfix list. Not silent: the cmdline must show.
 map("n", "c.", [[:%s/\<<C-r><C-w>\>//g<Left><Left>]])
-map("n", "<leader>c.", [[:%s/\<<C-r><C-a>\>//g<Left><Left>]])
-map("n", "<leader>R", [[:cfdo %s/\<<C-r><C-w>\>//ge | update]] .. string.rep("<Left>", 12))
+map("n", "<leader>c.", [[:cfdo %s/\<<C-r><C-w>\>//ge | update]] .. string.rep("<Left>", 12))
 
 map("n", "<Esc><Esc>", "<Esc>:nohlsearch<CR>", opts)
 map("n", "<leader>/", "<Esc>:nohlsearch<CR>", opts)
