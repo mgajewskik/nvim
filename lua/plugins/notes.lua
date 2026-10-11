@@ -88,38 +88,42 @@ local function open_current_obsidian_weekly_note()
    note:open({ sync = true })
 end
 
+-- Defaults match this machine's shell env; obsidian is skipped where the vault doesn't exist
+local notes_path = vim.env.NOTES_PATH or vim.fn.expand("~/obsidian")
+local notes_daily_path = vim.env.NOTES_DAILY_PATH or "area/journal/daily"
+
 return {
    {
       "obsidian-nvim/obsidian.nvim",
       version = "*",
       lazy = false,
-      ft = "markdown",
+      cond = vim.fn.isdirectory(notes_path) == 1,
       keys = {
-         { "<leader>zs", "<CMD>Obsidian search<CR>", { noremap = true } },
-         { "<leader>zf", "<CMD>Obsidian quick_switch<CR>", { noremap = true } },
-         { "<leader>zl", "<CMD>Obsidian links<CR>", { noremap = true } },
-         { "<leader>zh", "<CMD>Obsidian backlinks<CR>", { noremap = true } },
-         { "<leader>zd", "<CMD>Obsidian dailies -5<CR>", { noremap = true, desc = "Daily notes picker" } },
-         { "<leader>zw", open_current_obsidian_weekly_note, { noremap = true, desc = "Weekly note" } },
-         { "<leader>znd", "<CMD>Obsidian today<CR>", { noremap = true } },
-         { "<leader>znn", "<CMD>Obsidian new<CR>", { noremap = true, desc = "New note in inbox" } },
+         { "<leader>zs", "<CMD>Obsidian search<CR>" },
+         { "<leader>zf", "<CMD>Obsidian quick_switch<CR>" },
+         { "<leader>zl", "<CMD>Obsidian links<CR>" },
+         { "<leader>zh", "<CMD>Obsidian backlinks<CR>" },
+         { "<leader>zd", "<CMD>Obsidian dailies -5<CR>", desc = "Daily notes picker" },
+         { "<leader>zw", open_current_obsidian_weekly_note, desc = "Weekly note" },
+         { "<leader>znd", "<CMD>Obsidian today<CR>" },
+         { "<leader>znn", "<CMD>Obsidian new<CR>", desc = "New note in inbox" },
          {
             "<leader>znh",
             create_obsidian_note_in_current_dir,
             desc = "New note here",
          },
-         { "<leader>znt", "<CMD>Obsidian new_from_template<CR>", { noremap = true } },
-         { "<leader>zz", "<CMD>Obsidian follow_link vsplit<CR>", { noremap = true } },
-         { "<leader>zt", "<CMD>Obsidian tags<CR>", { noremap = true } },
-         { "<leader>zr", "<CMD>Obsidian rename<CR>", { noremap = true } },
-         { "<leader>za", "<CMD>Obsidian toggle_checkbox<CR>", { noremap = true } },
+         { "<leader>znt", "<CMD>Obsidian new_from_template<CR>" },
+         { "<leader>zz", "<CMD>Obsidian follow_link vsplit<CR>" },
+         { "<leader>zt", "<CMD>Obsidian tags<CR>" },
+         { "<leader>zr", "<CMD>Obsidian rename<CR>" },
+         { "<leader>za", "<CMD>Obsidian toggle_checkbox<CR>" },
       },
       opts = {
          legacy_commands = false,
          workspaces = {
             {
                name = "notes",
-               path = vim.fn.expand("$NOTES_PATH"),
+               path = notes_path,
             },
          },
          picker = {
@@ -131,7 +135,7 @@ return {
          new_notes_location = "notes_subdir",
          notes_subdir = "inbox",
          daily_notes = {
-            folder = vim.fn.expand("$NOTES_DAILY_PATH"),
+            folder = notes_daily_path,
             date_format = "%Y-%m-%d",
             default_tags = { "daily" },
             template = "daily.md",
@@ -157,15 +161,10 @@ return {
          attachments = {
             folder = "media",
          },
-         ui = {
-            enable = true,
-         },
          footer = {
             enabled = false,
          },
          checkbox = {
-            enabled = true,
-            create_new = true,
             order = { " ", "x" },
          },
          frontmatter = {

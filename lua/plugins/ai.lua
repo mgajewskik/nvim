@@ -1,8 +1,6 @@
 return {
    {
       "ChmaraX/herdr-nvim",
-      opts = {
-         keymaps = false,
-      },
+      opts = { keymaps = false },
    },
 }

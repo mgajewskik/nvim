@@ -1,10 +1,7 @@
 return {
    {
       "lambdalisue/suda.vim",
-      cmd = {
-         "SudaRead",
-         "SudaWrite",
-      },
+      cmd = { "SudaRead", "SudaWrite" },
    },
    {
       "tpope/vim-surround",
@@ -15,24 +12,10 @@ return {
       "tommcdo/vim-lion",
    },
    {
-      "mbbill/undotree",
-      keys = {
-         { "<leader>u", ":UndotreeToggle<CR>:UndotreeFocus<CR>", { noremap = true } },
-      },
-   },
-   {
+      -- keeps undo history when a file changes outside nvim
       "kevinhwang91/nvim-fundo",
       dependencies = { "kevinhwang91/promise-async" },
-      config = function()
-         require("fundo").install()
-      end,
-   },
-   {
-      "echasnovski/mini.comment",
-      event = "VeryLazy",
-      config = function()
-         require("mini.comment").setup()
-      end,
+      opts = {},
    },
    {
       "echasnovski/mini.pairs",
@@ -44,20 +27,8 @@ return {
             ["`"] = { action = "closeopen", pair = "``", neigh_pattern = "[^%a\\].", register = { cr = false } },
          },
       },
-      config = function(_, opts)
-         require("mini.pairs").setup(opts)
-      end,
    },
    {
-      "echasnovski/mini.ai",
-      event = "VeryLazy",
-      config = function()
-         require("mini.ai").setup()
-      end,
-   },
-   {
-      "LunarVim/bigfile.nvim",
-      event = "VeryLazy",
-      config = true,
+      "tpope/vim-obsession",
    },
 }

@@ -1,37 +1,78 @@
+-- Leap to the start of a word beginning with the typed character
+-- https://www.reddit.com/r/neovim/comments/16aan6k/comment/jz6maht/
+local function leap_to_word()
+   local ch = vim.fn.getcharstr()
+   if ch == " " then
+      print("Must insert a non-whitespace character")
+      return
+   end
+
+   local pattern = string.format("\\V%s", ch)
+   if ch:match("[a-z0-9]") then
+      pattern = string.format("\\<%s", ch)
+   elseif ch:match("[A-Z]") then
+      pattern = ([[\<%s\|\<%s\|[a-z]\@<=%s]]):format(ch:lower(), ch, ch)
+   end
+
+   local targets = require("leap.search").get_targets(pattern, {
+      windows = { vim.api.nvim_get_current_win() },
+      inputlen = 1,
+   })
+   if targets == nil then
+      print("No targets found")
+      return
+   end
+   require("leap").leap({ targets = targets })
+end
+
+-- Pick a directory under $HOME, then: enter = find files, ctrl-d = cd, ctrl-s = grep
+local function home_dirs()
+   local fzf_lua = require("fzf-lua")
+   local home = vim.fn.expand("$HOME")
+   fzf_lua.fzf_exec("fd --type d -i -L -E 'venv'", {
+      cwd = home,
+      prompt = "~ cd $HOME/",
+      fn_transform = function(x)
+         return fzf_lua.utils.ansi_codes.magenta(x)
+      end,
+      actions = {
+         ["default"] = function(selected)
+            fzf_lua.files({ cwd = home .. "/" .. selected[1] })
+         end,
+         ["ctrl-d"] = function(selected)
+            vim.cmd.cd(home .. "/" .. selected[1])
+         end,
+         ["ctrl-s"] = function(selected)
+            fzf_lua.live_grep({ cwd = home .. "/" .. selected[1] })
+         end,
+      },
+   })
+end
+
 return {
    {
       url = "https://codeberg.org/andyg/leap.nvim",
       event = "VeryLazy",
       config = function()
-         vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)")
-         vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
+         -- leap_to_word searches both directions, so no S; visual S belongs to vim-surround
+         vim.keymap.set({ "n", "x", "o" }, "s", leap_to_word, { silent = true })
       end,
    },
    {
       "ggandor/flit.nvim",
-      dependencies = {
-         { url = "https://codeberg.org/andyg/leap.nvim" },
-      },
+      dependencies = { { url = "https://codeberg.org/andyg/leap.nvim" } },
       event = "VeryLazy",
-      config = function()
-         require("flit").setup()
-      end,
+      opts = {},
    },
    {
       "mikavilpas/yazi.nvim",
+      dependencies = { { "nvim-lua/plenary.nvim", lazy = true } },
       keys = {
-         {
-            "<C-e>",
-            "<cmd>Yazi<cr>",
-            desc = "Open yazi at the current file",
-         },
+         { "<C-e>", "<cmd>Yazi<CR>", desc = "Open yazi at the current file" },
       },
       opts = {
          open_for_directories = true,
-         keymaps = {
-            show_help = "<f1>",
-            change_working_directory = "<c-d>",
-         },
+         keymaps = { change_working_directory = "<c-d>" },
          floating_window_scaling_factor = 0.7,
          integrations = {
             grep_in_selected_files = "fzf-lua",
@@ -41,12 +82,9 @@ return {
    },
    {
       "kyazdani42/nvim-tree.lua",
-      dependencies = {
-         "kyazdani42/nvim-web-devicons",
-      },
-      lazy = true,
+      dependencies = { "kyazdani42/nvim-web-devicons" },
       keys = {
-         { "<leader>e", ":NvimTreeToggle<CR>", { noremap = true } },
+         { "<leader>e", "<cmd>NvimTreeToggle<CR>" },
       },
       opts = {
          update_focused_file = {
@@ -55,76 +93,50 @@ return {
          },
          reload_on_bufenter = true,
          respect_buf_cwd = true,
-         view = {
-            centralize_selection = true,
-            -- side = "right",
-         },
+         view = { centralize_selection = true },
       },
-      -- <Tab> - preview
-      -- `I`               toggle_git_ignored  toggle visibility of files/folders hidden via |git.ignore| option
-      -- `H`               toggle_dotfiles     toggle visibility of dotfiles via |filters.dotfiles| option
-      -- `a`               create              add a file; leaving a trailing `/` will add a directory
-      -- `d`               remove              delete a file (will prompt for confirmation)
-      -- `D`               trash               trash a file via |trash| option
-      -- `r`               rename              rename a file
-      -- `<C-r>`           full_rename         rename a file and omit the filename on input
-      -- `x`               cut                 add/remove file/directory to cut clipboard
-      -- `c`               copy                add/remove file/directory to copy clipboard
-      -- `p`               paste               paste from clipboard; cut clipboard has precedence over copy; will prompt for confirmation
-      -- `y`               copy_name           copy name to system clipboard
-      -- `Y`               copy_path           copy relative path to system clipboard
-      -- `gy`              copy_absolute_path  copy absolute path to system clipboard
-      -- `f`               live_filter         live filter nodes dynamically based on regex matching.
-      -- `F`               clear_live_filter   clear live filter
-      -- `<C-k>`           toggle_file_info    toggle a popup with file infos about the file under the cursor
-      -- `W`               collapse_all        collapse the whole tree
-      -- `E`               expand_all          expand the whole tree, stopping after expanding |actions.expand_all.max_folder_discovery| folders; this might hang neovim for a while if running on a big folder
    },
    {
       "ibhagwan/fzf-lua",
-      dependencies = {
-         -- "junegunn/fzf",
-         -- "vijaymarupudi/nvim-fzf",
-         "kyazdani42/nvim-web-devicons",
-         -- "elanmed/fzf-lua-frecency.nvim",
-      },
+      dependencies = { "kyazdani42/nvim-web-devicons" },
       lazy = false,
       keys = {
-         { "<leader>ss", ":FzfLua<CR>", { noremap = true } },
-         { "<C-p>", ":FzfLua files<CR>", { noremap = true } },
-         { "<leader>rf", ":FzfLua files cwd=$HOME/<CR>", { noremap = true } },
-         { "<leader>sn", ":FzfLua files cwd=$HOME/.config/nvim/<CR>", { noremap = true } },
-         { "<leader>si", ":FzfLua files cwd=$HOME/.config/<CR>", { noremap = true } },
-         { "<leader>sw", ":FzfLua files cwd=$WORKSPACE/notes/<CR>", { noremap = true } },
-         { "<leader>f", ":FzfLua git_files<CR>", { noremap = true } },
-         { "<leader>`", ":FzfLua buffers<CR>", { noremap = true } },
-         { "<leader><leader>", ":FzfLua buffers<CR>", { noremap = true } },
-         { "<leader>\\\\", ":FzfLua grep_visual<CR>", { noremap = true } },
-         { "\\\\", ":FzfLua live_grep<CR>", { noremap = true } },
-         { "//", ":FzfLua blines<CR>", { noremap = true } },
-         { "<leader>sq", ":FzfLua quickfix<CR>", { noremap = true } },
-         { "gr", ":FzfLua lsp_references<CR>", { noremap = true } },
-         { "gm", ":FzfLua lsp_implementations<CR>", { noremap = true } },
-         { "<leader>ls", ":FzfLua lsp_document_symbols<CR>", { noremap = true } },
-         { "<leader>lS", ":FzfLua lsp_workspace_symbols<CR>", { noremap = true } },
-         { "<leader>as", ":FzfLua lsp_code_actions<CR>", { noremap = true } },
-         { "<leader>sd", ":FzfLua lsp_document_diagnostics<CR>", { noremap = true } },
-         { "<leader>sD", ":FzfLua lsp_workspace_diagnostics<CR>", { noremap = true } },
-         { "<leader>sb", ":FzfLua git_branches<CR>", { noremap = true } },
-         { "<leader>sc", ":FzfLua git_commits<CR>", { noremap = true } },
-         { "<leader>sC", ":FzfLua git_bcommits<CR>", { noremap = true } },
-         { "<leader>sm", ":FzfLua marks<CR>", { noremap = true } },
-         { "<leader>sx", ":FzfLua commands<CR>", { noremap = true } },
-         { "<leader>s:", ":FzfLua command_history<CR>", { noremap = true } },
-         { "<leader>s/", ":FzfLua search_history<CR>", { noremap = true } },
-         { '<leader>s"', ":FzfLua registers<CR>", { noremap = true } },
-         { "<leader>sk", ":FzfLua keymaps<CR>", { noremap = true } },
+         { "<leader>ss", "<cmd>FzfLua<CR>" },
+         { "<C-p>", "<cmd>FzfLua files<CR>" },
+         { "<leader>f", "<cmd>FzfLua git_files<CR>" },
+         { "<leader>rf", "<cmd>FzfLua files cwd=$HOME/<CR>" },
+         { "<leader>sn", "<cmd>FzfLua files cwd=$HOME/.config/nvim/<CR>" },
+         { "<leader>si", "<cmd>FzfLua files cwd=$HOME/.config/<CR>" },
+         { "<leader>sw", "<cmd>FzfLua files cwd=$WORKSPACE/notes/<CR>" },
+         { "<C-r>", home_dirs },
+         { "<leader>rr", home_dirs },
+         { "<leader>`", "<cmd>FzfLua buffers<CR>" },
+         { "<leader><leader>", "<cmd>FzfLua buffers<CR>" },
+         { "\\\\", "<cmd>FzfLua live_grep<CR>" },
+         { "<leader>\\\\", "<cmd>FzfLua grep_visual<CR>" },
+         { "<leader>ws", "<cmd>FzfLua grep_cword<CR>" },
+         { "//", "<cmd>FzfLua blines<CR>" },
+         { "<leader>sq", "<cmd>FzfLua quickfix<CR>" },
+         { "<leader>sb", "<cmd>FzfLua git_branches<CR>" },
+         { "<leader>sc", "<cmd>FzfLua git_commits<CR>" },
+         { "<leader>sC", "<cmd>FzfLua git_bcommits<CR>" },
+         { "<leader>sm", "<cmd>FzfLua marks<CR>" },
+         { "<leader>sx", "<cmd>FzfLua commands<CR>" },
+         { "<leader>s:", "<cmd>FzfLua command_history<CR>" },
+         { "<leader>s/", "<cmd>FzfLua search_history<CR>" },
+         { '<leader>s"', "<cmd>FzfLua registers<CR>" },
+         { "<leader>sk", "<cmd>FzfLua keymaps<CR>" },
+         -- LSP pickers; grr/gri replace the built-in quickfix versions
+         { "grr", "<cmd>FzfLua lsp_references<CR>" },
+         { "gri", "<cmd>FzfLua lsp_implementations<CR>" },
+         { "<leader>ls", "<cmd>FzfLua lsp_document_symbols<CR>" },
+         { "<leader>lS", "<cmd>FzfLua lsp_workspace_symbols<CR>" },
+         { "<leader>as", "<cmd>FzfLua lsp_code_actions<CR>" },
+         { "<leader>sd", "<cmd>FzfLua lsp_document_diagnostics<CR>" },
+         { "<leader>sD", "<cmd>FzfLua lsp_workspace_diagnostics<CR>" },
       },
       opts = function()
          local actions = require("fzf-lua.actions")
-         local ripgrep_opts =
-            "--column --line-number --no-heading --color=always --smart-case --no-ignore --hidden --max-columns=512 --ignore-file $HOME/.gitignore_global"
-
          return {
             winopts = {
                height = 0.85,
@@ -133,223 +145,20 @@ return {
                col = 0.55,
             },
             actions = {
-               files = {
-                  ["default"] = actions.file_edit_or_qf,
-                  ["ctrl-s"] = actions.file_split,
-                  ["ctrl-v"] = actions.file_vsplit,
-                  ["ctrl-t"] = actions.file_tabedit,
-                  ["ctrl-q"] = actions.file_sel_to_qf,
-               },
+               -- true: keep the default file actions
+               files = { true, ["ctrl-q"] = actions.file_sel_to_qf },
             },
             files = {
-               git_icons = false,
                -- fzf-lua prefers fd over rg when available; rg_opts alone never applied
                no_ignore = true,
                fd_opts = [[--color=never --type f --type l --no-ignore --hidden --exclude .git]],
                rg_opts = [[--color=never --files --no-ignore --hidden -g "!.git"]],
             },
             grep = {
-               git_icons = false,
-               rg_opts = ripgrep_opts,
+               rg_opts = "--column --line-number --no-heading --color=always --smart-case --no-ignore --hidden --max-columns=512 --ignore-file $HOME/.config/git/ignore",
             },
-            lsp = {
-               async_or_timeout = 3000,
-               git_icons = false,
-            },
-            quickfix = {
-               git_icons = false,
-            },
+            lsp = { async_or_timeout = 3000 },
          }
       end,
-      config = function(_, opts)
-         opts = opts or {}
-         require("fzf-lua").setup(opts)
-         -- require("fzf-lua-frecency").setup({
-         --    cwd_only = true,
-         --    display_score = true,
-         -- })
-
-         local map = vim.keymap.set
-         -- doesn't work with keya mapping
-         map("n", "<leader>ws", ":FzfLua grep_cword<CR>", { noremap = true })
-         -- map("v", "<leader>ws", ":FzfLua grep_visual<CR>", { noremap = true })
-
-         map("n", "<C-r>", ":lua require('utils').home_fzf()<CR>", { noremap = true })
-         map("n", "<leader>rr", ":lua require('utils').home_fzf('fd --type d -i -L')<CR>", { noremap = true })
-      end,
-   },
-   {
-      "nvim-telescope/telescope.nvim",
-      dependencies = {
-         -- "nvim-telescope/telescope-fzf-native.nvim", { 'do': 'make' }
-         -- "nvim-telescope/telescope-media-files.nvim"
-         -- "nvim-lua/popup.nvim",
-         "nvim-telescope/telescope-project.nvim",
-         "nvim-lua/plenary.nvim",
-      },
-      lazy = true,
-      keys = {
-         { "<leader>st", ":Telescope<CR>", { noremap = true } },
-         { "<leader>sp", ":Telescope project<CR>", { noremap = true } },
-      },
-      opts = function()
-         local actions = require("telescope.actions")
-         return {
-            defaults = {
-               prompt_prefix = "❯ ",
-               -- selection_caret = "❯ ",
-               selection_caret = " ",
-               selection_strategy = "reset",
-               sorting_strategy = "ascending",
-               scroll_strategy = "cycle",
-               color_devicons = true,
-               winblend = 0,
-               -- path_display = { "shorten" },
-               initial_mode = "insert",
-               --   border = {},
-               --   use_less = true,
-               --   set_env = { ["COLORTERM"] = "truecolor" }, -- default = nil,
-               layout_strategy = "flex",
-               layout_config = {
-                  width = 0.95,
-                  height = 0.85,
-                  prompt_position = "top",
-                  horizontal = {
-                     -- width_padding = 0.1,
-                     -- height_padding = 0.1,
-                     width = 0.9,
-                     preview_cutoff = 60,
-                     preview_width = function(_, cols, _)
-                        if cols > 200 then
-                           return math.floor(cols * 0.7)
-                        else
-                           return math.floor(cols * 0.6)
-                        end
-                     end,
-                  },
-                  vertical = {
-                     -- width_padding = 0.05,
-                     -- height_padding = 1,
-                     width = 0.75,
-                     height = 0.85,
-                     preview_height = 0.4,
-                     mirror = true,
-                  },
-                  flex = {
-                     -- change to horizontal after 120 cols
-                     flip_columns = 120,
-                  },
-               },
-               mappings = {
-                  i = {
-                     ["<C-x>"] = actions.delete_buffer,
-                     ["<C-s>"] = actions.select_horizontal,
-                     ["<C-v>"] = actions.select_vertical,
-                     ["<C-t>"] = actions.select_tab,
-
-                     ["<C-j>"] = actions.move_selection_next,
-                     ["<C-k>"] = actions.move_selection_previous,
-                     ["<S-up>"] = actions.preview_scrolling_up,
-                     ["<S-down>"] = actions.preview_scrolling_down,
-                     ["<C-up>"] = actions.preview_scrolling_up,
-                     ["<C-down>"] = actions.preview_scrolling_down,
-
-                     ["<C-u>"] = actions.move_to_top,
-                     ["<C-d>"] = actions.move_to_middle,
-                     ["<C-b>"] = actions.move_to_top,
-                     ["<C-f>"] = actions.move_to_bottom,
-
-                     ["<M-q>"] = actions.send_to_qflist + actions.open_qflist,
-                     ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
-
-                     ["<C-c>"] = actions.close,
-                     ["<Esc>"] = actions.close,
-                     -- ["<M-m>"] = actions.master_stack,
-                     ["<PageUp>"] = actions.results_scrolling_up,
-                     ["<PageDown>"] = actions.results_scrolling_down,
-                     ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
-                     ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-                     ["<c-h>"] = actions.which_key,
-                     ["<c-x>"] = actions.delete_buffer,
-                  },
-                  n = {
-                     ["<CR>"] = actions.select_default + actions.center,
-                     ["<C-x>"] = actions.delete_buffer,
-                     ["<C-s>"] = actions.select_horizontal,
-                     ["<C-v>"] = actions.select_vertical,
-                     ["<C-t>"] = actions.select_tab,
-
-                     ["j"] = actions.move_selection_next,
-                     ["k"] = actions.move_selection_previous,
-                     ["<S-up>"] = actions.preview_scrolling_up,
-                     ["<S-down>"] = actions.preview_scrolling_down,
-                     ["<C-up>"] = actions.preview_scrolling_up,
-                     ["<C-down>"] = actions.preview_scrolling_down,
-
-                     ["<C-u>"] = actions.move_to_top,
-                     ["<C-d>"] = actions.move_to_middle,
-                     ["<C-b>"] = actions.move_to_top,
-                     ["<C-f>"] = actions.move_to_bottom,
-
-                     ["<C-q>"] = actions.send_to_qflist,
-                     ["<M-q>"] = actions.send_to_qflist + actions.open_qflist,
-
-                     ["<C-c>"] = actions.close,
-                     -- ["<Esc>"] = false,
-                     ["<Esc>"] = actions.close,
-                     -- ["<Tab>"] = actions.toggle_selection,
-                  },
-               },
-            },
-            extensions = {
-               project = {
-                  base_dirs = {},
-               },
-            },
-         }
-      end,
-      config = function(_, opts)
-         local telescope = require("telescope")
-         telescope.setup(opts)
-         -- Default mappings (insert mode):
-         -- Key	Description
-         -- <c-d>	delete currently selected project
-         -- <c-v>	rename currently selected project
-         -- <c-a>	create a project*
-         -- <c-s>	search inside files within your project
-         -- <c-b>	browse inside files within your project
-         -- <c-l>	change to the selected project's directory without opening it
-         -- <c-r>	find a recently opened file within your project
-         -- <c-f>	find a file within your project (same as <CR>)
-         telescope.load_extension("project")
-      end,
-   },
-   {
-      "chentoast/marks.nvim",
-      event = "VeryLazy",
-      opts = {
-         mappings = {
-            next = "]m",
-            prev = "[m",
-         },
-      },
-      -- mx              Set mark x
-      -- m,              Set the next available alphabetical (lowercase) mark
-      -- m;              Toggle the next available mark at the current line
-      -- dmx             Delete mark x
-      -- dm-             Delete all marks on the current line
-      -- dm<space>       Delete all marks in the current buffer
-      -- m]              Move to next mark
-      -- m[              Move to previous mark
-      -- m:              Preview mark. This will prompt you for a specific mark to
-      --                 preview; press <cr> to preview the next mark.
-      --
-      -- m[0-9]          Add a bookmark from bookmark group[0-9].
-      -- dm[0-9]         Delete all bookmarks from bookmark group[0-9].
-      -- m}              Move to the next bookmark having the same type as the bookmark under
-      --                 the cursor. Works across buffers.
-      -- m{              Move to the previous bookmark having the same type as the bookmark under
-      --                 the cursor. Works across buffers.
-      -- dm=             Delete the bookmark under the cursor.
    },
 }
