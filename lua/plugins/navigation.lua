@@ -25,6 +25,19 @@ local function leap_to_word()
    require("leap").leap({ targets = targets })
 end
 
+-- flit-style f/t/F/T, from leap's README: autojump, repeat with the same key, case-sensitive like Vim
+local function leap_ft(kwargs)
+   require("leap").leap(vim.tbl_deep_extend("keep", kwargs, {
+      inputlen = 1,
+      inclusive = true,
+      opts = {
+         labels = "",
+         safe_labels = vim.fn.mode(1):match("no?") and "" or nil,
+         vim_opts = { ["go.ignorecase"] = false },
+      },
+   }))
+end
+
 -- Pick a directory under $HOME, then: enter = find files, ctrl-d = cd, ctrl-s = grep
 local function home_dirs()
    local fzf_lua = require("fzf-lua")
@@ -56,13 +69,22 @@ return {
       config = function()
          -- leap_to_word searches both directions, so no S; visual S belongs to vim-surround
          vim.keymap.set({ "n", "x", "o" }, "s", leap_to_word, { silent = true })
+
+         local clever = require("leap.user").with_traversal_keys
+         local clever_f, clever_t = clever("f", "F"), clever("t", "T")
+         vim.keymap.set({ "n", "x", "o" }, "f", function()
+            leap_ft({ opts = clever_f })
+         end)
+         vim.keymap.set({ "n", "x", "o" }, "F", function()
+            leap_ft({ backward = true, opts = clever_f })
+         end)
+         vim.keymap.set({ "n", "x", "o" }, "t", function()
+            leap_ft({ offset = -1, opts = clever_t })
+         end)
+         vim.keymap.set({ "n", "x", "o" }, "T", function()
+            leap_ft({ backward = true, offset = 1, opts = clever_t })
+         end)
       end,
-   },
-   {
-      "ggandor/flit.nvim",
-      dependencies = { { url = "https://codeberg.org/andyg/leap.nvim" } },
-      event = "VeryLazy",
-      opts = {},
    },
    {
       "mikavilpas/yazi.nvim",
