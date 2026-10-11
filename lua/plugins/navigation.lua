@@ -17,16 +17,6 @@ return {
          require("flit").setup()
       end,
    },
-   -- {
-   --    "cbochs/portal.nvim",
-   --    event = "VeryLazy",
-   --    config = function()
-   --       local map = vim.keymap.set
-   --
-   --       map("n", "<leader>o", "<cmd>Portal jumplist backward<cr>", { noremap = true })
-   --       map("n", "<leader>i", "<cmd>Portal jumplist forward<cr>", { noremap = true })
-   --    end,
-   -- },
    {
       "mikavilpas/yazi.nvim",
       keys = {
@@ -49,24 +39,6 @@ return {
          },
       },
    },
-   -- {
-   --    "ptzz/lf.vim",
-   --    dependencies = {
-   --       "voldikss/vim-floaterm",
-   --    },
-   --    lazy = true,
-   --    keys = {
-   --       { "<C-e>", ":Lf<CR>", { noremap = true } },
-   --    },
-   --    init = function()
-   --       vim.g.lf_map_keys = 0
-   --       vim.g.lf_replace_netrw = 1
-   --       -- vim.g.floaterm_opener = "vsplit"
-   --       vim.g.floaterm_opener = "edit"
-   --       -- this does not work
-   --       -- vim.g.lf_command_override = 'lf -command "set hidden"'
-   --    end,
-   -- },
    {
       "kyazdani42/nvim-tree.lua",
       dependencies = {

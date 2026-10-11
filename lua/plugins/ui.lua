@@ -1,21 +1,4 @@
 return {
-   -- {
-   --    "karb94/neoscroll.nvim",
-   --    opts = {
-   --       hide_cursor = false,
-   --       -- easing = "circular",
-   --       duration_multiplier = 0.5,
-   --       mappings = {
-   --          "<C-u>",
-   --          "<C-d>",
-   --          "<C-b>",
-   --          "<C-y>",
-   --          "zt",
-   --          "zz",
-   --          "zb",
-   --       },
-   --    },
-   -- },
    {
       "akinsho/toggleterm.nvim",
       lazy = true,
@@ -34,34 +17,6 @@ return {
          },
       },
    },
-   -- {
-   --    "tzachar/local-highlight.nvim",
-   --    event = "VeryLazy",
-   --    opts = {
-   --       -- hlgroup = "CursorLine",
-   --       hlgroup = "TelescopeSelection",
-   --    },
-   --    -- config = function()
-   --    --    require("local-highlight").setup()
-   --    -- end,
-   -- },
-   -- {
-   -- throws some red errors, don't want to keep it
-   --    "winston0410/range-highlight.nvim",
-   --    event = "VeryLazy",
-   --    dependencies = {
-   --       "winston0410/cmd-parser.nvim",
-   --    },
-   --    config = function()
-   --       require("range-highlight").setup()
-   --    end,
-   -- },
-   -- {
-   --    "norcalli/nvim-colorizer.lua",
-   --    lazy = true,
-   --    cmd = "ColorizerToggle",
-   --    config = true,
-   -- },
    {
       "uga-rosa/ccc.nvim",
       lazy = false,
