@@ -52,6 +52,20 @@ o.wildmode = "longest:full,full"
 o.winminwidth = 5
 o.writebackup = false
 
+-- No display (ssh, devcontainer): copy through the terminal with OSC 52; paste from nvim's own register
+-- because OSC 52 reads need terminal permission and otherwise wait up to 10s
+if not (vim.env.WAYLAND_DISPLAY or vim.env.DISPLAY) then
+   local osc52 = require("vim.ui.clipboard.osc52")
+   local function paste()
+      return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+   end
+   vim.g.clipboard = {
+      name = "OSC 52",
+      copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
+      paste = { ["+"] = paste, ["*"] = paste },
+   }
+end
+
 -- Built-in message UI (experimental in 0.12): messages show in a timed popup instead of the cmdline
 require("vim._core.ui2").enable({ msg = { targets = "msg" } })
 
