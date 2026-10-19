@@ -6,7 +6,7 @@ return {
       build = ":TSUpdate",
       config = function()
          -- install() skips parsers that are already installed
-         require("nvim-treesitter").install({
+         local install = require("nvim-treesitter").install({
             "bash",
             "css",
             "cmake",
@@ -43,6 +43,10 @@ return {
             "nix",
             "hyprlang",
          })
+         -- headless (my dotfiles install the plugins this way): wait, so the parsers exist when nvim quits
+         if #vim.api.nvim_list_uis() == 0 then
+            install:wait(300000)
+         end
 
          vim.api.nvim_create_autocmd("FileType", {
             group = vim.api.nvim_create_augroup("treesitter_setup", { clear = true }),

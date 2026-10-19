@@ -31,11 +31,21 @@ return {
             return not registry.is_installed(pkg)
          end, vim.list_extend(vim.tbl_values(servers), tools))
          if #missing > 0 then
+            local started = false
             registry.refresh(function()
                for _, pkg in ipairs(missing) do
                   registry.get_package(pkg):install()
                end
+               started = true
             end)
+            -- headless (my dotfiles install the plugins this way): wait, so the packages exist when nvim quits
+            if #vim.api.nvim_list_uis() == 0 then
+               vim.wait(900000, function()
+                  return started and not vim.iter(missing):any(function(pkg)
+                     return registry.get_package(pkg):is_installing()
+                  end)
+               end, 500)
+            end
          end
       end,
    },
