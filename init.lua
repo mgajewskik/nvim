@@ -52,9 +52,11 @@ o.wildmode = "longest:full,full"
 o.winminwidth = 5
 o.writebackup = false
 
--- No display (ssh, devcontainer): copy through the terminal with OSC 52; paste from nvim's own register
--- because OSC 52 reads need terminal permission and otherwise wait up to 10s
-if not (vim.env.WAYLAND_DISPLAY or vim.env.DISPLAY) then
+-- Over ssh, in a container or with no display: copy through the terminal with OSC 52, even with a DISPLAY
+-- (desktop-lite sets DISPLAY=:1 for its VNC desktop, which isn't my clipboard); paste from nvim's own
+-- register because OSC 52 reads need terminal permission and otherwise wait up to 10s
+local remote = vim.env.SSH_TTY or vim.uv.fs_stat("/run/.containerenv") or vim.uv.fs_stat("/.dockerenv")
+if remote or not (vim.env.WAYLAND_DISPLAY or vim.env.DISPLAY) then
    local osc52 = require("vim.ui.clipboard.osc52")
    local function paste()
       return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
