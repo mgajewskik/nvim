@@ -48,7 +48,7 @@ local function open_current_obsidian_weekly_note()
    local util = require("obsidian.util")
 
    local weekly_opts = vim.tbl_extend("force", {
-      folder = "area/journal/weekly",
+      folder = "7_journal/weekly",
       date_format = "GGGG-[W]WW",
       template = "weekly.md",
    }, Obsidian.opts.weekly_notes or {})
@@ -90,7 +90,7 @@ end
 
 -- Defaults match this machine's shell env; obsidian is skipped where the vault doesn't exist
 local notes_path = vim.env.NOTES_PATH or vim.fn.expand("~/obsidian")
-local notes_daily_path = vim.env.NOTES_DAILY_PATH or "area/journal/daily"
+local notes_daily_path = vim.env.NOTES_DAILY_PATH or "7_journal/daily"
 
 return {
    {
@@ -151,7 +151,7 @@ return {
             max_lines = 3000,
          },
          new_notes_location = "notes_subdir",
-         notes_subdir = "inbox",
+         notes_subdir = "1_inbox",
          daily_notes = {
             folder = notes_daily_path,
             date_format = "%Y-%m-%d",
@@ -159,12 +159,12 @@ return {
             template = "daily.md",
          },
          weekly_notes = {
-            folder = "area/journal/weekly",
+            folder = "7_journal/weekly",
             date_format = "GGGG-[W]WW",
             template = "weekly.md",
          },
          templates = {
-            folder = "templates",
+            folder = "3_area/obsidian/templates",
             date_format = "%Y-%m-%d",
             time_format = "%H:%M",
             substitutions = {
@@ -177,7 +177,7 @@ return {
             },
          },
          attachments = {
-            folder = "media",
+            folder = "6_media",
          },
          footer = {
             enabled = false,
